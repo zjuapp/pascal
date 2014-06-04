@@ -1,0 +1,5 @@
+if c > 3
+	then 
+		c := c + a
+	else
+		c := b;
