@@ -13,8 +13,8 @@ private:
 	}
 public:
 	bool insert(const string type_id, shared_ptr <base_type> type);
-	pair <int,int> searchoffset(const string & id);
-	pair <int, int> searchoffset(const string & id, int index);
-	pair <int, int> searchoffset(const string & id, const string & member);
+	pair <int,int> search(const string & id);
+	pair <int, int> search(const string & id, int index);
+	pair <int, int> search(const string & id, const string & member);
 	void gencode();
 };

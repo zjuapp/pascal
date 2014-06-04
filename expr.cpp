@@ -13,6 +13,7 @@ void unary_expr::gencode(int &i){
 	}
 	cout << codestr << endl;
 }
+
 void binary_expr::gencode(int & i){
 	int k = i;
 	int l = ++i;
@@ -30,6 +31,7 @@ void binary_expr::gencode(int & i){
 	}
 	cout << codestr << endl;
 }
+
 void leaf_node_value::gencode(int &i){
 	string str = value_set_to_str(type_id, value);
 	switch(type_id){
@@ -42,8 +44,9 @@ void leaf_node_value::gencode(int &i){
 	++i;
 	cout << codestr << endl;
 }
+
 void record_node_value::gencode(int & i){
-	auto off = enviroment::single() -> top() -> v_r -> searchoffset(id, member);
+	auto off = enviroment::single() -> top() -> v_r -> search(id, member);
 	switch(off.second){
 	case INT_TYPE:
 		codestr = "LW R" + itoa(i) + " " + itoa(off.first) + "($SP)";
@@ -59,7 +62,7 @@ void record_node_value::gencode(int & i){
 bool record_node_value::expr_value_type(){
 	if(flag)
 		return type_id;
-	auto off = enviroment::single() -> top() -> v_r -> searchoffset(id, member);
+	auto off = enviroment::single() -> top() -> v_r -> search(id, member);
 	if(off.second == INT_TYPE)
 		type_id = false;
 	else
@@ -67,6 +70,7 @@ bool record_node_value::expr_value_type(){
 	flag = true;
 	return type_id;
 }
+
 bool unary_expr::expr_value_type(){
 	if(flag){
 		return type_id;
@@ -75,6 +79,7 @@ bool unary_expr::expr_value_type(){
 	flag = true;
 	return type_id;
 }
+
 bool binary_expr::expr_value_type(){
 	if(flag){
 		return type_id;
@@ -82,4 +87,20 @@ bool binary_expr::expr_value_type(){
 	type_id = lchild -> expr_value_type() && rchild -> expr_value_type();
 	flag = true;
 	return type_id;
+}
+
+bool id_node_value::expr_value_type(){
+
+}
+
+void id_node_value::gencode(int &i){
+
+}
+
+bool arr_node_value::expr_value_type(){
+
+}
+
+void arr_node_value::gencode(int &i){
+
 }

@@ -40,6 +40,8 @@
 	func * _function;
 	pair<int, pair < vector <string>, type_ptr > > * _para_type_list;
 	vector < pair<int, pair <vector <string>, type_ptr> > > * _para_decl_list;
+	vector < shared_ptr <base_expr> > *  _args_list;
+	proc_stmt * _proc_stmt;
 }
 
 %token  LP RP LB RB DOT COMMA COLON MUL DIV PLUS MINUS ID GE GT LE LT EQUAL ASSIGN INTEGER REAL CHAR STRING CONST SEMI VAR PROGRAM TYPE SYS_TYPE RECORD DF ARRAY BP END BEGINN MOD UNEQUAL DR NOT AND CASEE IFF DOO TO DOWNTO UNTIL FOR WHILE ELSEE OF REPEAT GOTO THEN PROCEDURE FUNCTION SYS_PROC
@@ -94,6 +96,8 @@
 %type <_procedure_decl> procedure_decl
 %type <_para_decl_list> 	parameters
 %type <_function> function_decl
+%type <_args_list> args_list
+%type <_proc_stmt> proc_stmt
 %%
 program : PROGRAM ID SEMI routine DOT{
 	$4 -> name = $2;
@@ -543,7 +547,7 @@ non_label_stmt:
 
 	}
 	| proc_stmt {
-
+		$$ = $1;
 	}
 	;
 
@@ -657,11 +661,29 @@ goto_stmt : GOTO INTEGER{
 	;
 
 proc_stmt : SYS_PROC
-          | ID
-          | ID LP args_list RP
+          | ID{
+          	$$ = new proc_stmt();
+          	$$ -> proc_id = $1;
+          }
+          | ID LP args_list RP{
+          	$$ = new proc_stmt();
+          	$$ -> proc_id = $1;
+          	$$ -> param = *$3;
+          	delete $3;
+          }
           | SYS_PROC LP args_list RP
           ;
-
+args_list : args_list  COMMA  expression{
+	shared_ptr <base_expr> tmp($3);
+	$1 -> push_back(tmp);
+	$$ = $1;
+	}
+	|expression{
+	$$ = new vector < shared_ptr <base_expr> > ();
+	shared_ptr <base_expr> tmp($1);
+	$$ -> push_back(tmp);
+	}
+	;
 routine_part : routine_part procedure_decl{
 		shared_ptr <routine> tmp($2);
 		$1 -> vt.push_back(tmp);

@@ -105,7 +105,9 @@ public:
 };
 
 class proc_stmt: public base_stmt{
-
+public:
+	string proc_id;
+	vector < shared_ptr <base_expr> > param;
 };
 
 

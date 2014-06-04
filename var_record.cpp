@@ -6,20 +6,22 @@ bool var_record::insert(const string type_id, shared_ptr <base_type> type){
 	vt.push_back(make_pair(type_id, type));
 	return true;
 }
-pair <int,int> var_record::searchoffset(const string & id){
+pair <int,int> var_record::search(const string & id){
 	int off = 0;
-	for(int i = 0; i < vt.size(); ++i){
+	int l = vt.size();
+	for(int i = l - 1; i >= 0; --i){
 		if(vt[i].first != id)
 			off += vt[i].second -> getsize();
 		else{
 			return make_pair(off, vt[i].second -> gettype());
 		}
 	}
-	return make_pair(-1, -1);
+	return make_pair(off, -1);
 }
-pair <int, int> var_record::searchoffset(const string & id, int index){
+pair <int, int> var_record::search(const string & id, int index){
 	int off = 0;
-	for(int i = 0; i < vt.size(); ++i){
+	int l = vt.size();
+	for(int i = l - 1; i >= 0; --i){
 		if(vt[i].first != id)
 			off += vt[i].second -> getsize();
 		else{
@@ -32,11 +34,12 @@ pair <int, int> var_record::searchoffset(const string & id, int index){
 				return make_pair(-1,-1);
 		}
 	}
-	return make_pair(-1,-1);
+	return make_pair(off,-1);
 }
-pair <int, int> var_record::searchoffset(const string & id, const string & member){
+pair <int, int> var_record::search(const string & id, const string & member){
 	int off = 0;
-	for(int i = 0; i < vt.size(); ++i){
+	int l = vt.size();
+	for(int i = l - 1; i >= 0; --i){
 		if(vt[i].first != id)
 			off += vt[i].second -> getsize();
 		else{
@@ -49,7 +52,7 @@ pair <int, int> var_record::searchoffset(const string & id, const string & membe
 			}
 		}
 	}
-	return make_pair(-1,-1);
+	return make_pair(off,-1);
 }
 void var_record::gencode(){
 	int off = 0;
