@@ -27,7 +27,6 @@ pair <int, int> var_record::search(const string & id, int index){
 		else{
 			if(vt[i].second -> gettype() == ARR_TYPE){
 				arr_type * tmp = (arr_type *)vt[i].second.get();
-				off += tmp -> nxt -> getsize() * index;
 				return make_pair(off, tmp -> nxt -> gettype());
 			}
 			else
@@ -40,8 +39,9 @@ pair <int, int> var_record::search(const string & id, const string & member){
 	int off = 0;
 	int l = vt.size();
 	for(int i = l - 1; i >= 0; --i){
-		if(vt[i].first != id)
+		if(vt[i].first != id){
 			off += vt[i].second -> getsize();
+		}
 		else{
 			if(vt[i].second -> gettype() == RECORD_TYPE){
 				record_type * tmp = (record_type *)vt[i].second.get();
@@ -49,6 +49,9 @@ pair <int, int> var_record::search(const string & id, const string & member){
 				if(off2.first == -1)
 					return make_pair(-1,-1);
 				return make_pair(off + off2.first, off2.second);
+			}
+			else{
+				cout << "id name error" << endl;
 			}
 		}
 	}

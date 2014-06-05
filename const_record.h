@@ -3,7 +3,7 @@
 #include "type_value.h"
 class const_record{
 private:
-	map <string , pair<type_ptr, value_set> >mp;
+	map <string , key_value_tuple >mp;
 public:
 	bool insert(const string & id, 
 		type_ptr type, 
@@ -20,8 +20,13 @@ public:
 			<< " " << value_set_to_str(i -> second.first -> gettype(), i -> second.second) << endl;
 		}
 	}
-	bool exist_check(){
-		
+	key_value_tuple const_replace(const string & id){
+		if(mp.find(id) == mp.end()){
+			value_set tmp;
+			return make_pair(nullptr, tmp);
+		}	
+		else
+			return mp[id];
 	}
 };
 

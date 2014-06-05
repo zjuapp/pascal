@@ -96,7 +96,7 @@ public:
 class arr_node_value: public base_expr{
 public:
 	string id;
-	int index;
+	shared_ptr <base_expr> index;
 	arr_node_value(){
 		type = ARR_EXPR_TYPE;
 	}

@@ -42,7 +42,6 @@ sys_type int|string|real|char
 record "record"
 end "end"
 array "array"
-df "of"
 begin "begin"
 casee "case"
 iff "if"
@@ -82,7 +81,6 @@ procedure "procedure"
 {end} {return END;}
 {begin} {return BEGINN;}
 {type} {return TYPE;}
-{df} {return DF;}
 {array} {return ARRAY;}
 {var} {return VAR;}
 {plus}  {return PLUS;}

@@ -57,8 +57,9 @@ public:
 		return _size;
 	}
 	pair <int, int> search(const string & id){
+		int l = vt.size();
 		int off = 0;
-		for(int i = 0; i < vt.size(); ++i){
+		for(int i = l - 1; i >= 0; --i){
 			if(vt[i].first == id){
 				int type_id = vt[i].second -> gettype();
 				return make_pair(off, type_id);
@@ -67,7 +68,7 @@ public:
 				off += vt[i].second -> getsize();
 			}
 		}
-		return make_pair(-1, -1);
+		return make_pair(off, -1);
 	}
 };
 class arr_type: public base_type{
@@ -77,6 +78,9 @@ public:
 	}
 	type_ptr index;
 	type_ptr nxt;
+	int getsize(){
+		return nxt -> getsize() * index -> getsize();	
+	}
 private:
 };
 class continue_type:public base_type{
@@ -87,7 +91,11 @@ public:
 	key_value_tuple left;
 	key_value_tuple right;
 	int getsize(){
-		return left.second._double - right.second._double;
+		if(left.first -> gettype() == INT_TYPE){
+			return right.second._int - left.second._int + 1;
+		}
+		else
+		return right.second._double - left.second._double + 1;
 	}
 private:
 };

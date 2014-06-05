@@ -16,6 +16,8 @@ var
 	end;
 	t:int;
 	i:int;
+	arr : array [1..10] of int;
+
 procedure fuck(var a,b:int);
 begin
 	a := a + 1;
@@ -29,6 +31,6 @@ end
 ;
 
 begin
-	fuck(a : i);
+	fuck(c.a : i);
 end
-.	
+.

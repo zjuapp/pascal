@@ -7,7 +7,7 @@ a
 ADDI R3 , R1,1
 SUB R2, R3 , R3
 param 0
-20
+56
 param 1
-0
+40
 0

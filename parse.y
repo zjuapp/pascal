@@ -44,7 +44,7 @@
 	proc_stmt * _proc_stmt;
 }
 
-%token  LP RP LB RB DOT COMMA COLON MUL DIV PLUS MINUS ID GE GT LE LT EQUAL ASSIGN INTEGER REAL CHAR STRING CONST SEMI VAR PROGRAM TYPE SYS_TYPE RECORD DF ARRAY BP END BEGINN MOD UNEQUAL DR NOT AND CASEE IFF DOO TO DOWNTO UNTIL FOR WHILE ELSEE OF REPEAT GOTO THEN PROCEDURE FUNCTION SYS_PROC
+%token  LP RP LB RB DOT COMMA COLON MUL DIV PLUS MINUS ID GE GT LE LT EQUAL ASSIGN INTEGER REAL CHAR STRING CONST SEMI VAR PROGRAM TYPE SYS_TYPE RECORD ARRAY BP END BEGINN MOD UNEQUAL DR NOT AND CASEE IFF DOO TO DOWNTO UNTIL FOR WHILE ELSEE OF REPEAT GOTO THEN PROCEDURE FUNCTION SYS_PROC
 
 %type <_str> ID
 %type <_tuple> const_value
@@ -215,10 +215,11 @@ type_decl: simple_type_decl {
 		$$ = $1;
 	}
 	;
-array_type_decl : ARRAY LB simple_type_decl RB DF type_decl{
-		$$ = new arr_type();
-		((arr_type * )$$) -> nxt.reset($6);
-		((arr_type * )$$) -> index.reset($3);
+array_type_decl : ARRAY LB simple_type_decl RB OF type_decl{
+		arr_type * tmp = new arr_type();
+		tmp -> nxt.reset($6);
+		tmp -> index.reset($3);
+		$$ = tmp;
 	}
 	;
 record_type_decl: RECORD field_decl_list END{
@@ -277,8 +278,9 @@ simple_type_decl : SYS_TYPE
 		continue_type * tmp = new continue_type();
 		tmp -> left = *$1;
 		tmp -> right = *$4;
+		$$ = tmp;
 		delete $1;
-		delete $4;	
+		delete $4;
 	}
 	| MINUS const_value DOT DOT const_value{
 			if($2 -> first -> gettype() == INT_TYPE){
@@ -290,6 +292,7 @@ simple_type_decl : SYS_TYPE
 			continue_type * tmp = new continue_type();
 			tmp -> left = *$2;
 			tmp -> right = *$5;
+			$$ = tmp;
 			delete $5;
 			delete $2;
 	}
@@ -310,6 +313,7 @@ simple_type_decl : SYS_TYPE
 			continue_type * tmp = new continue_type();
 			tmp -> left = *$2;
 			tmp -> right = *$6;
+			$$ = tmp;
 			delete $2;
 			delete $6;
 	}
@@ -472,7 +476,9 @@ factor: ID {
 		$$ = tmp;
 	}
 	| ID LB expression RB{
-
+		arr_node_value * tmp = new arr_node_value();
+		tmp -> id = $1;
+		tmp -> index.reset($3);
 	}	
 	| ID DOT ID{
 		record_node_value * tmp = new record_node_value();
@@ -492,6 +498,18 @@ factor: ID {
 		leaf_node_value * tmp = new leaf_node_value();
 		tmp -> type_id = REAL_TYPE;
 		tmp -> value._double = $1;
+		$$ = tmp;
+	}
+	|CHAR{
+		leaf_node_value * tmp = new leaf_node_value();
+		tmp -> type_id = CHAR_TYPE;
+		tmp -> value._double = $1;
+		$$ = tmp;
+	}
+	|STRING{
+		leaf_node_value * tmp = new leaf_node_value();
+		tmp -> type_id = STR_TYPE;
+		tmp -> value._str = $1;
 		$$ = tmp;
 	}
 	;
