@@ -8,6 +8,9 @@ public:
 	}
 	virtual void gencode(){
 	}
+	virtual void emitcode(){
+		cout << codestr << endl;
+	}
 	void setcode(const string & _codestr){
 		codestr = _codestr;
 	}
@@ -28,12 +31,11 @@ public:
 	shared_ptr <base_stmt> lchild;
 	shared_ptr <base_stmt> rchild;
 	void gencode(){
-
 	}
 	void debug(){
 		puts("if_stmt");
 		int i = 2;
-		judge -> gencode(i);
+		judge -> gencode();
 		lchild -> debug();
 		if(rchild.get() != nullptr)
 		rchild -> debug();
@@ -46,7 +48,10 @@ public:
 	void debug(){
 
 	}
-
+	virtual void emitcode(){
+		value -> emitcode();
+		cout << codestr << endl;
+	}
 };
 class record_assign: public assign_stmt{
 public:
@@ -57,7 +62,7 @@ public:
 		puts("record_assign");
 		int i = 2;
 		cout << id << " " << member << endl;
-		value -> gencode(i);
+		value -> gencode();
 	}
 };
 class normal_assign: public assign_stmt{
@@ -68,7 +73,7 @@ public:
 		puts("normal_assign:");
 		int i = 2;
 		cout << id << endl;
-		value -> gencode(i);
+		value -> gencode();
 	}
 };
 class arr_assign: public assign_stmt{
@@ -79,8 +84,8 @@ public:
 		puts("arr_assign");
 		cout << id << "\nindex:\n";
 		int i = 2;
-		index -> gencode(i);
-		value -> gencode(i);
+		index -> gencode();
+		value -> gencode();
 	}
 };
 
@@ -91,7 +96,7 @@ public:
 	void debug(){
 		puts("while:");
 		int i = 2;
-		judge -> gencode(i);
+		judge -> gencode();
 		stmt -> debug();
 	}
 };
@@ -107,9 +112,9 @@ public:
 		puts("forr");
 		int i = 2;
 		puts("start");
-		start -> gencode(i);
+		start -> gencode();
 		puts("end");
-		end -> gencode(i);
+		end -> gencode();
 		puts("stmt");
 		stmt -> debug();
 	}	
@@ -126,7 +131,7 @@ public:
 			stmt_vt -> vt[i] -> debug();
 		}
 		cout << "judge" << endl;
-		judge -> gencode(j);
+		judge -> gencode();
 	}
 };
 

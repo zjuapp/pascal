@@ -13,24 +13,19 @@ var
 	c:record
 		a:int;
 		b,d:real;
-	end;
+	end;	
 	t:int;
-	i:int;
-	arr : array [1..10] of int;
 
-procedure fuck(var a,b:int);
+function add(a,b:int),int;
 begin
-	a := a + 1;
+	add := a + b;
 end
 ;
 
-function fuck1(var a,b:int), int;
+	
 begin
-	a := a + 1;
-end
-;
-
-begin
-	fuck(c.a : i);
+	a := 3 + 2;
+	t := 4;
+	t := 4;
 end
 .

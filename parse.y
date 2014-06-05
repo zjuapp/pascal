@@ -101,6 +101,9 @@
 %%
 program : PROGRAM ID SEMI routine DOT{
 	$4 -> name = $2;
+	enviroment::single() -> clear();
+	$4 -> add_function_param();
+	$4 -> gencode();
 }
 routine: routine_head routine_body{
 	$$ = new routine();
@@ -119,6 +122,7 @@ routine_head: const_part{
 	}
 	routine_part{
 	enviroment::single() -> top() -> r_r.reset($7);
+	$$ = enviroment::single() -> top().get();
 	}
 ;
 sub_routine: routine_head routine_body{
@@ -534,8 +538,6 @@ stmt_list: stmt_list stmt SEMI{
 
 stmt: INTEGER COLON non_label_stmt{
 	} | non_label_stmt{
-		$$ = $1;
-		$1 -> debug();
 	}
 
 non_label_stmt:

@@ -1,62 +1,134 @@
 #include "expr.h"
 #include "enviroment.h"
-void unary_expr::gencode(int &i){
-	int k = i;
-	child -> gencode(i);
+#include "reg.h"
+#include "common.h"
+int unary_expr::gencode(){
+	int k = child -> gencode();
 	switch(op){
 	case MINUS_TYPE:
-		codestr = "SUB R" + itoa(k) + ", R1, R" + itoa(k);
+		codestr = "xor " + reg::single() -> finde(k) + ", -1";
+		codestr += "\nadd " + reg::single() -> finde(k) + ", 1";
 		break;
 	case NOT_TYPE:
-		codestr = "SUB R" + itoa(k) + ", R1, R" + itoa(k);
-		codestr += "\nADDI R" + itoa(k) + ", R" + itoa(k) + ", -1";
+		codestr = "xor " + reg::single() -> finde(k) + ", -1";
+		break;
 	}
-	cout << codestr << endl;
+	return k;
 }
 
-void binary_expr::gencode(int & i){
-	int k = i;
-	int l = ++i;
-	lchild -> gencode(i);
-	int r = i;
-	rchild -> gencode(i);
+int binary_expr::gencode(){
+	auto _reg = reg::single();
+	int l = lchild -> gencode();
+	int r = rchild -> gencode();
 	switch(op){
 	case MUL_TYPE:
-		codestr = "MUL R" + itoa(k) + ", R" + itoa(l) + " , R" + itoa(r);
+		codestr = "imul " + _reg -> finde(l) +", " + _reg -> finde(r);
 		break;
 	case PLUS_TYPE:
-		codestr = "ADD R" + itoa(k) + ", R" + itoa(l) + " , R" + itoa(r); 
+		codestr = "add " + _reg -> finde(l) +", " + _reg -> finde(r);
+		break;
 	case MINUS_TYPE:
-		codestr = "SUB R" + itoa(k) + ", R" + itoa(l) + " , R" + itoa(r); 	
+		codestr = "sub " + _reg -> finde(l) +", " + _reg -> finde(r);
+		break;
+	case DIV_TYPE:
+		codestr  = "mov eax, " + _reg -> finde(l);
+		codestr += "\nidiv " + _reg -> finde(r);
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
+		break;
+	case GE_TYPE:
+		codestr = "cmp " + _reg -> finde(l) + ", " + _reg -> finde(r);
+		codestr += "\npushf";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 7";
+		codestr += "\nand eax, 1";
+		codestr += "\nxor eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
+		break;
+	case GT_TYPE:
+		codestr = "cmp " + _reg -> finde(r) + ", " + _reg -> finde(l);
+		codestr += "\npushf";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 7";
+		codestr += "\nand eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
+		break;
+	case LE_TYPE:
+		codestr = "cmp " + _reg -> finde(r) + ", " + _reg -> finde(l);
+		codestr += "\npushf";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 7";
+		codestr += "\nand eax, 1";
+		codestr += "\nxor eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
+		break;
+	case LT_TYPE:
+		codestr = "cmp " + _reg -> finde(l) + ", " + _reg -> finde(r);
+		codestr += "\npushf";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 7";
+		codestr += "\nand eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
+		break;
+	case EQUAL_TYPE:
+		codestr = "cmp " + _reg -> finde(l) + ", " + _reg -> finde(r);
+		codestr += "\npushf";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 6";
+		codestr += "\nand eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
+		break;
+	case MOD_TYPE:
+		codestr  = "mov eax, " + _reg -> finde(l);
+		codestr += "\nidiv " + _reg -> finde(r);
+		codestr += "\nmov " + _reg -> finde(l) + ", edx";
+		break;
+	case UNEQUAL_TYPE:
+		codestr = "cmp " + _reg -> finde(l) + ", " + _reg -> finde(r);
+		codestr += "\npushf";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 6";
+		codestr += "\nand eax, 1";
+		codestr += "\nxor eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
+		break;
+	case AND_TYPE:
+		codestr = "and " + _reg -> finde(l) +", " + _reg -> finde(r);
+		break;
 	}
-	cout << codestr << endl;
+	_reg -> setfree(r);
+	return l;
 }
 
-void leaf_node_value::gencode(int &i){
+int leaf_node_value::gencode(){
+	auto _reg = reg::single();
 	string str = value_set_to_str(type_id, value);
+	int k = _reg -> findfree();
 	switch(type_id){
 	case INT_TYPE:
-		codestr = "ADDI R" + itoa(i) + " , R1," + str;
+		codestr = "xor " + _reg -> finde(k) + "," + _reg -> finde(k);
+		codestr += "\nmov " + _reg -> finde(k) + ", " + str;
 		break;
 	case REAL_TYPE:
-		codestr = "ADDI F" + itoa(i) + " , R1," + str;	
+		;
 	}
-	++i;
-	cout << codestr << endl;
+	_reg -> setflag(k);
+	return k;
 }
 
-void record_node_value::gencode(int & i){
+int record_node_value::gencode(){
+	auto _reg = reg::single();
 	auto off = enviroment::single() -> top() -> v_r -> search(id, member);
+	int k = _reg -> findfree();
 	switch(off.second){
 	case INT_TYPE:
-		codestr = "LW R" + itoa(i) + " " + itoa(off.first) + "($SP)";
+		codestr = "mov ebp, esp";
+		codestr += "\nmov " + _reg -> finde(k) + ", [bp - " + itoa(off.first) + "]";
 		break;
 	case REAL_TYPE:
-		codestr = "L.D R" + itoa(i) + " " + itoa(off.first) + "($SP)" + 
-		"\n" + "MTC1 R" + itoa(i) + ", F" + itoa(1);
+		;
 	}
-	++i;
-	cout << codestr << endl;
+	_reg -> setflag(k);
+	return k;
 }
 
 bool record_node_value::expr_value_type(){
@@ -90,17 +162,27 @@ bool binary_expr::expr_value_type(){
 }
 
 bool id_node_value::expr_value_type(){
-
+	
 }
 
-void id_node_value::gencode(int &i){
-
+int id_node_value::gencode(){
+	auto _reg = reg::single();
+	auto off = enviroment::single() -> top() -> v_r -> search(id);
+	int k = _reg -> findfree();
+	switch(off.second){
+	case INT_TYPE:
+		codestr = "mov ebp, esp";
+		codestr += "\nmov " + _reg -> finde(k) + ", [bp - " + itoa(off.first) + "]";
+		break;
+	}
+	_reg -> setflag(k);
+	return k;
 }
 
 bool arr_node_value::expr_value_type(){
 
 }
 
-void arr_node_value::gencode(int &i){
-
+int arr_node_value::gencode(){
+	return 3;
 }

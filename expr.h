@@ -24,8 +24,8 @@ public:
 		flag = false;
 		type = BASE_EXPR_TYPE;
 	}
-	virtual void gencode(int &i){
-	}//i 表示是放在哪个寄存器中
+	virtual int gencode(){
+	}//return the value is store in?
 	void setcodestr(const string & _codestr){
 		codestr = _codestr;
 	}
@@ -35,16 +35,29 @@ public:
 	virtual ~base_expr(){
 		
 	}
+	virtual bool isconst(){
+
+	}
+	virtual void emitcode(){
+
+	}
 };
 
 class unary_expr: public base_expr{
 public:
 	int op;
 	shared_ptr <base_expr> child;
-	void gencode(int &i);
+	int gencode();
 	bool expr_value_type();
 	unary_expr(){
 		type = UNARY_EXPR_TYPE;
+	}
+	bool isconst(){
+		return child -> isconst();
+	}
+	void emitcode(){
+		child -> emitcode();
+		cout << codestr << endl;
 	}
 };
 
@@ -54,32 +67,52 @@ public:
 	int op;
 	shared_ptr <base_expr>  lchild;
 	shared_ptr <base_expr> rchild;
-	void gencode(int & i);
+	int gencode();
 	bool expr_value_type();
 	binary_expr(){
 		type = BINARY_EXPR_TYPE;
+	}
+	bool isconst(){
+		return lchild -> isconst() && rchild -> isconst();
+	}
+	void emitcode(){
+		lchild -> emitcode();
+		rchild -> emitcode();
+		cout << codestr << endl;
 	}
 };
 class leaf_node_value: public base_expr{
 public:
 	value_set value;
 	int type_id;
-	void gencode(int &i);
+	int gencode();
 	bool expr_value_type(){
 		if(type_id == INT_TYPE)
 			return false;
 		else
 			return true;
 	}
+	bool isconst(){
+		return true;
+	}
+	void emitcode(){
+		cout << codestr << endl;
+	}
 }; 
 class record_node_value: public base_expr{
 public:
 	string id;
 	string member;
-	void gencode(int & i);
+	int gencode();
 	bool expr_value_type();
 	record_node_value(){
 		type = RECORD_EXPR_TYPE;
+	}
+	bool isconst(){
+		return false;
+	}
+	void emitcode(){
+		cout << codestr << endl;
 	}
 };
 
@@ -89,8 +122,14 @@ public:
 	id_node_value(){
 		type = ID_EXPR_TYPE;
 	}
-	void gencode(int & i);
+	int gencode();
 	bool expr_value_type();
+	bool isconst(){
+		return false;
+	}
+	void emitcode(){
+		cout << codestr << endl;
+	}
 };
 
 class arr_node_value: public base_expr{
@@ -100,6 +139,12 @@ public:
 	arr_node_value(){
 		type = ARR_EXPR_TYPE;
 	}
-	void gencode(int &i);
+	int gencode();
 	bool expr_value_type();
+	bool isconst(){
+		return false;
+	}
+	void emitcode(){
+		cout << codestr << endl;
+	}
 };

@@ -16,11 +16,12 @@ public:
 	string type;
 	shared_ptr <routine_head> header;
 	shared_ptr <stmt_list> stmt_vt;
-	virtual void gen(int * a){
-
-	}
+	virtual void gencode();
 	string gettype(){
 		return type;
+	}
+	virtual void add_function_param(){
+
 	}
 };
 
@@ -49,6 +50,13 @@ public:
 	procedure(){
 		type = PROC_ROUTINE;
 	}
+	void add_function_param(){
+		int l = param.size();
+		map <string, string> mp;
+		for(int i = l - 1; i >= 0; --i){
+			header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
+		}
+	}
 };
 
 class func: public routine{
@@ -59,5 +67,12 @@ public:
 	func(){
 		type = FUNC_ROUTINE;
 	}
-
+	void add_function_param(){
+		int l = param.size();
+		map <string, string> mp;
+		for(int i = l - 1; i >= 0; --i){
+			header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
+		}
+		header -> v_r -> insert_front(name, ret);
+	}
 };

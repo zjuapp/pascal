@@ -1,18 +1,21 @@
 #include "stmt.h"
 #include "enviroment.h"
+#include "reg.h"
 void record_assign::gencode(){
-	int i = 2;
-	value -> gencode(i);
+	auto _reg = reg::single();
+	_reg -> clear();
+	int k  = value -> gencode();
 	auto in = enviroment::single() -> search(id, member);
-	codestr = "SW R2, " +  itoa(in.first) + "($SP)";
-	cout << codestr << endl;
+	codestr = "mov ebp, esp";
+	codestr += "\nmov [ebp - " + itoa(in.first) + "], " + _reg -> finde(k);
 }
 void normal_assign::gencode(){
-	int i =  2;	
-	value -> gencode(i);
+	auto _reg = reg::single();
+	_reg -> clear();
+	int k  = value -> gencode();
 	auto in = enviroment::single() -> search(id);
-	codestr = "SW R2, " +  itoa(in.first) + "($SP)";
-	cout << codestr << endl;
+	codestr = "mov ebp, esp";
+	codestr += "\nmov [ebp - " + itoa(in.first) + "], " + _reg -> finde(k); 
 }
 void proc_stmt::debug(){
 	auto rout = enviroment::single() -> searchfunc(proc_id);
@@ -73,7 +76,7 @@ void proc_stmt::debug(){
 			}
 			else{
 				cout << "param " << i << endl;
-				param[i] -> gencode(i);
+				//param[i] -> gencode(i);
 			}	
 		}
 	}

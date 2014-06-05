@@ -3,6 +3,9 @@ void enviroment::insert(routine_head * tmp){
 	shared_ptr <routine_head> tp(tmp);
 	q.push_back(tp);
 }
+void enviroment::insert(shared_ptr <routine_head> tmp){
+	q.push_back(tmp);
+}
 shared_ptr <routine_head> enviroment::top(){
 	return q.back();
 }
@@ -78,4 +81,7 @@ shared_ptr <routine> enviroment::searchfunc(const string & id){
 		}
 	}
 	return nullptr;	
+}
+void enviroment::clear(){
+	q.clear();
 }

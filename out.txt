@@ -1,13 +1,16 @@
-normal_assign:
-a
-ADDI R3 , R1,1
-SUB R2, R3 , R3
-normal_assign:
-a
-ADDI R3 , R1,1
-SUB R2, R3 , R3
-param 0
-56
-param 1
-40
-0
+6
+xor esi,esi
+mov esi, 3
+xor edi,edi
+mov edi, 2
+add esi, edi
+mov ebp, esp
+mov [ebp - 0], esi
+xor esi,esi
+mov esi, 4
+mov ebp, esp
+mov [ebp - 0], esi
+xor esi,esi
+mov esi, 4
+mov ebp, esp
+mov [ebp - 0], esi

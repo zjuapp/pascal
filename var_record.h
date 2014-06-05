@@ -3,7 +3,7 @@
 class var_record{
 private:
 	map <string, shared_ptr <base_type> > mp;
-	vector < pair <string, shared_ptr <base_type> > > vt;
+	deque < pair <string, shared_ptr <base_type> > > vt;
 	string concat(const vector <string> & vt){
 		string res = "";
 		for(const string & s: vt){
@@ -13,6 +13,7 @@ private:
 	}
 public:
 	bool insert(const string type_id, shared_ptr <base_type> type);
+	bool insert_front(const string type_id, shared_ptr <base_type> type);
 	pair <int,int> search(const string & id);
 	pair <int, int> search(const string & id, int index);
 	pair <int, int> search(const string & id, const string & member);
