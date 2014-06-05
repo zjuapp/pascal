@@ -116,13 +116,13 @@ routine_head: const_part{
 	enviroment::single() -> insert($$);
 	} type_part {
 		shared_ptr <type_record> tmp($3);
-		enviroment::single() -> top() -> t_r.reset();
+		enviroment::single() -> top() -> t_r.reset($3);
 	}var_part {
 	enviroment::single() -> top() -> v_r.reset($5);
 	}
 	routine_part{
 	enviroment::single() -> top() -> r_r.reset($7);
-	$$ = enviroment::single() -> top().get();
+	$$ = enviroment::single() -> top();
 	}
 ;
 sub_routine: routine_head routine_body{
@@ -253,19 +253,20 @@ field_decl: name_list  COMMA type_decl SEMI{
 
 simple_type_decl : SYS_TYPE
 	{
-		if(strcmp($1, "int")){
+		if(strcmp($1, "int") == 0){
 			$$ = new base_type(INT_TYPE);
 		}
 		else
-			if(strcmp($1, "real")){
+			if(strcmp($1, "real") == 0){
+				cout << "fuck real" <<endl;
 				$$ = new base_type(REAL_TYPE);
 			}
 			else
-			if(strcmp($1, "char")){
+			if(strcmp($1, "char") == 0){
 				$$ = new base_type(CHAR_TYPE);
 			}
 			else
-			if(strcmp($1, "string")){
+			if(strcmp($1, "string") == 0){
 				$$ = new base_type(STR_TYPE);
 			}
 	}

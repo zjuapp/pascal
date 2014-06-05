@@ -20,9 +20,7 @@ public:
 	string gettype(){
 		return type;
 	}
-	virtual void add_function_param(){
-
-	}
+	virtual void add_function_param();
 };
 
 class routine_record{
@@ -50,13 +48,7 @@ public:
 	procedure(){
 		type = PROC_ROUTINE;
 	}
-	void add_function_param(){
-		int l = param.size();
-		map <string, string> mp;
-		for(int i = l - 1; i >= 0; --i){
-			header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
-		}
-	}
+	void add_function_param();
 };
 
 class func: public routine{
@@ -67,12 +59,5 @@ public:
 	func(){
 		type = FUNC_ROUTINE;
 	}
-	void add_function_param(){
-		int l = param.size();
-		map <string, string> mp;
-		for(int i = l - 1; i >= 0; --i){
-			header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
-		}
-		header -> v_r -> insert_front(name, ret);
-	}
+	void add_function_param();
 };

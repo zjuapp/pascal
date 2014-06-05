@@ -7,12 +7,12 @@ const
 
 type
 	c = int;
-	b = real;
+	b = int;
 var 
 	a:int;
 	c:record
 		a:int;
-		b,d:real;
+		b,d:int;
 	end;	
 	t:int;
 
@@ -21,8 +21,6 @@ begin
 	add := a + b;
 end
 ;
-
-	
 begin
 	a := 3 + 2;
 	t := 4;

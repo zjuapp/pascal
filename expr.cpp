@@ -168,6 +168,7 @@ bool id_node_value::expr_value_type(){
 int id_node_value::gencode(){
 	auto _reg = reg::single();
 	auto off = enviroment::single() -> top() -> v_r -> search(id);
+	cout << off.second << endl;
 	int k = _reg -> findfree();
 	switch(off.second){
 	case INT_TYPE:

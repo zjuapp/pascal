@@ -1,17 +1,12 @@
 #include "enviroment.h"
 void enviroment::insert(routine_head * tmp){
-	shared_ptr <routine_head> tp(tmp);
-	q.push_back(tp);
-}
-void enviroment::insert(shared_ptr <routine_head> tmp){
 	q.push_back(tmp);
 }
-shared_ptr <routine_head> enviroment::top(){
+routine_head * enviroment::top(){
 	return q.back();
 }
 void enviroment::pop(){
 	q.pop_back();
-	
 }
 shared_ptr <enviroment> enviroment::single(){
 	static bool flag = false;
