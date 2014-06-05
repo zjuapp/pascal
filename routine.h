@@ -4,7 +4,8 @@
 #include "var_record.h"
 #include "stmt.h"
 #include "type_value.h"
-
+#define FUNC_ROUTINE "func_routine"
+#define PROC_ROUTINE "proc_routine"
 
 
 class routine_head;
@@ -12,10 +13,14 @@ class routine_head;
 class routine{
 public:
 	string name;
+	string type;
 	shared_ptr <routine_head> header;
 	shared_ptr <stmt_list> stmt_vt;
 	virtual void gen(int * a){
 
+	}
+	string gettype(){
+		return type;
 	}
 };
 
@@ -41,6 +46,9 @@ class procedure: public routine{
 public:
 	vector < pair<int, pair <string, type_ptr> > > param;
 	void gencode();
+	procedure(){
+		type = PROC_ROUTINE;
+	}
 };
 
 class func: public routine{
@@ -48,4 +56,8 @@ public:
 	vector < pair<int, pair <string, type_ptr> > > param;
 	shared_ptr <base_type> ret;
 	void gencode();
+	func(){
+		type = FUNC_ROUTINE;
+	}
+
 };

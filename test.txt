@@ -14,6 +14,7 @@ var
 		a:int;
 		b,d:real;
 	end;
+	t:int;
 	i:int;
 procedure fuck(var a,b:int);
 begin
@@ -28,29 +29,6 @@ end
 ;
 
 begin
-	a := a + 1;
-	if a > 3 then
-		a := a - 1
-	else
-		a := a + 1;
-
-	repeat
-		a := a - 1;
-		c.a := a;
-		c.b := c.d;
-	until a > 3;
-
-	while a < 3 do
-		a := a + 1;
-
-	for i := 1 to 10 do
-		a := 2 * a;
-	case a of
-		1, a := a + 1;
-		2, a := a + 2;
-		3, a := a + 3;
-		4, a := a + 4;
-	end;
-	fuck;
+	fuck(a : i);
 end
 .	

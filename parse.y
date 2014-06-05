@@ -517,6 +517,7 @@ stmt_list: stmt_list stmt SEMI{
 stmt: INTEGER COLON non_label_stmt{
 	} | non_label_stmt{
 		$$ = $1;
+		$1 -> debug();
 	}
 
 non_label_stmt:
@@ -626,6 +627,7 @@ case_stmt : CASEE expression OF case_expr_list
 			case_stmt * tmp = new case_stmt();
 			tmp -> expr.reset($2);
 			tmp -> case_list.reset($4);
+			$$ = tmp;
 		}
 		;
 case_expr_list : case_expr_list  case_expr{
@@ -645,11 +647,13 @@ case_expr : const_value
 		case_expr_const * tmp = new case_expr_const();
 		tmp -> value.reset($1);
 		tmp -> stmt.reset($3);
+		$$ = tmp;
 	}
 		| ID COLON stmt SEMI{
 			case_expr_id * tmp = new case_expr_id();
 			tmp -> id = $1;
 			tmp -> stmt.reset($3);
+			$$ = tmp;
 		}
 		;
 
@@ -737,8 +741,6 @@ para_type_list : var_para_list COMMA  simple_type_decl{
 			$$ -> second.second.reset($3);
 		}
 		| val_para_list COMMA simple_type_decl{
-		puts("4");
-		
 		$$ = new pair<int, pair <vector <string>, type_ptr> >();
 			$$ -> first = 0; 
 			$$ -> second.first = *$1;
@@ -779,6 +781,7 @@ void yyerror(char * s){
 }
 int main()
 {
+	freopen("out.txt", "w", stdout);
 	printf("%d\n", yyparse());
 }
 

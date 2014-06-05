@@ -11,6 +11,9 @@ public:
 	void setcode(const string & _codestr){
 		codestr = _codestr;
 	}
+	virtual void debug(){
+
+	}
 };
 
 
@@ -27,11 +30,22 @@ public:
 	void gencode(){
 
 	}
+	void debug(){
+		puts("if_stmt");
+		int i = 2;
+		judge -> gencode(i);
+		lchild -> debug();
+		if(rchild.get() != nullptr)
+		rchild -> debug();
+	}
 };
 
 class assign_stmt:public base_stmt{
 public:
 	shared_ptr <base_expr> value;
+	void debug(){
+
+	}
 
 };
 class record_assign: public assign_stmt{
@@ -39,23 +53,47 @@ public:
 	string id;
 	string member;
 	void gencode();
-
+	void debug(){
+		puts("record_assign");
+		int i = 2;
+		cout << id << " " << member << endl;
+		value -> gencode(i);
+	}
 };
 class normal_assign: public assign_stmt{
 public:
 	string id;
 	void gencode();
+	void debug(){
+		puts("normal_assign:");
+		int i = 2;
+		cout << id << endl;
+		value -> gencode(i);
+	}
 };
 class arr_assign: public assign_stmt{
 public:
 	shared_ptr <base_expr> index;
 	string id;
+	void debug(){
+		puts("arr_assign");
+		cout << id << "\nindex:\n";
+		int i = 2;
+		index -> gencode(i);
+		value -> gencode(i);
+	}
 };
 
 class while_stmt: public base_stmt{
 public:
 	shared_ptr <base_expr> judge;
 	shared_ptr <base_stmt> stmt;
+	void debug(){
+		puts("while:");
+		int i = 2;
+		judge -> gencode(i);
+		stmt -> debug();
+	}
 };
 
 class for_stmt: public base_stmt{
@@ -64,50 +102,88 @@ public:
 	shared_ptr <base_expr> start;
 	shared_ptr <base_expr> end;
 	shared_ptr <base_stmt> stmt;
-	int dic;	
+	int dic;
+	void debug(){
+		puts("forr");
+		int i = 2;
+		puts("start");
+		start -> gencode(i);
+		puts("end");
+		end -> gencode(i);
+		puts("stmt");
+		stmt -> debug();
+	}	
 };
 
 class repeat_stmt: public base_stmt{
 public:
 	shared_ptr <stmt_list> stmt_vt;
 	shared_ptr <base_expr> judge;
+	void debug(){
+		cout << "repeat" << endl;
+		int j = 2;
+		for(int i = 0; i < stmt_vt -> vt.size(); ++i){
+			stmt_vt -> vt[i] -> debug();
+		}
+		cout << "judge" << endl;
+		judge -> gencode(j);
+	}
 };
 
 class case_expr{
 public:
 	shared_ptr <base_stmt> stmt;
+	virtual void debug(){
+
+	}
 };
 
 class case_expr_id : public case_expr{
 public:
 	string id;
+	void debug(){
+		cout << id << endl;
+	}
 };
 
 class case_expr_const: public case_expr{
 public:
 	shared_ptr <key_value_tuple> value;
+	void debug(){
+		cout << value_set_to_str(value -> first -> gettype(),
+			value -> second) << endl;
+	}
 };
 
 class case_expr_list{
 public:
 	vector < shared_ptr<case_expr> >  case_vt;
+	void debug(){ 
+		for(int i = 0; i < case_vt.size();++i)
+			case_vt[i] -> debug();
+	}
 };
 class case_stmt: public base_stmt{
 public:
 	shared_ptr <base_expr> expr;
 	shared_ptr <case_expr_list> case_list;
+	void debug(){
+		cout << "fuck case" << endl;
+		cout <<" case_expr" << endl;
+		case_list -> debug();
+	}
 };
 
 class goto_stmt:public base_stmt{
 public:
 	int addr;//address to go
-
 };
 
 class proc_stmt: public base_stmt{
 public:
 	string proc_id;
 	vector < shared_ptr <base_expr> > param;
+	void debug();
 };
 
 
