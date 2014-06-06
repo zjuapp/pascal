@@ -30,8 +30,7 @@ public:
 	shared_ptr <base_expr>  judge;
 	shared_ptr <base_stmt> lchild;
 	shared_ptr <base_stmt> rchild;
-	void gencode(){
-	}
+	void gencode();
 	void debug(){
 		puts("if_stmt");
 		int i = 2;
@@ -87,6 +86,7 @@ public:
 		index -> gencode();
 		value -> gencode();
 	}
+	void gencode();
 };
 
 class while_stmt: public base_stmt{
@@ -99,6 +99,7 @@ public:
 		judge -> gencode();
 		stmt -> debug();
 	}
+	void gencode();
 };
 
 class for_stmt: public base_stmt{
@@ -118,6 +119,7 @@ public:
 		puts("stmt");
 		stmt -> debug();
 	}	
+	void gencode();
 };
 
 class repeat_stmt: public base_stmt{
@@ -177,6 +179,7 @@ public:
 		cout <<" case_expr" << endl;
 		case_list -> debug();
 	}
+	void gencode();
 };
 
 class goto_stmt:public base_stmt{
@@ -189,6 +192,7 @@ public:
 	string proc_id;
 	vector < shared_ptr <base_expr> > param;
 	void debug();
+	void gencode();
 };
 
 

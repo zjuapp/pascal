@@ -3,17 +3,30 @@
 #include "common.h"
 void func::gencode(){
 	cout << name << ":" << endl;
+	for(int i = 0; i < param.size(); ++i){//reload the pass by address
+		if(param[i].first){
+			cout << "mov eax, [esp + " + itoa(param.size() * 4 + 8 - (i + 1) * 4) + "]\n";
+			cout << "add eax, " << itoa((param.size() + 3) * 4) << endl;
+			cout << "mov [esp + " + itoa(param.size() * 4 + 8 - (i + 1) * 4) + "], eax" << endl;
+		}	
+	}
 	routine::gencode();
 }
 void procedure::gencode(){
 	cout << name << ":" << endl;
+	for(int i = 0; i < param.size(); ++i){//reload the pass by address
+		if(param[i].first){
+			cout << "mov eax, [esp + " + itoa(param.size() * 4 + 8 - (i + 1) * 4) + "]\n";
+			cout << "add eax, " << itoa((param.size() + 3) * 4) << endl;
+			cout << "mov [esp + " + itoa(param.size() * 4 + 8  - (i + 1) * 4) + "], eax" << endl;
+		}	
+	}
 	routine::gencode();
 }
 void routine::gencode(){
 	enviroment::single() -> insert(this -> header.get());
 	for(int i = 0; i < stmt_vt -> vt.size(); ++i){
 		stmt_vt -> vt[i] -> gencode();
-		stmt_vt -> vt[i] -> emitcode();
 	}
 	for(int i = 0; i < header -> r_r -> vt.size(); ++i){
 		header -> r_r -> vt[i] -> gencode();
@@ -27,7 +40,9 @@ void routine::add_function_param(){
 }
 void procedure::add_function_param(){
 	int l = param.size();
-	map <string, string> mp;
+	shared_ptr <base_type> tmp(new base_type(INT_TYPE));
+	header -> v_r -> insert_front("~nop1", tmp);
+	header -> v_r -> insert_front("~nop2", tmp);
 	for(int i = l - 1; i >= 0; --i){
 		header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
 	}
@@ -35,6 +50,9 @@ void procedure::add_function_param(){
 }
 void func::add_function_param(){
 	int l = param.size();
+	shared_ptr <base_type> tmp(new base_type(INT_TYPE));
+	header -> v_r -> insert_front("~nop1", tmp);
+	header -> v_r -> insert_front("~nop2", tmp);
 	for(int i = l - 1; i >= 0; --i){
 		header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
 	}

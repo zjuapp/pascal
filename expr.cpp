@@ -13,6 +13,7 @@ int unary_expr::gencode(){
 		codestr = "xor " + reg::single() -> finde(k) + ", -1";
 		break;
 	}
+	cout << codestr << endl;
 	return k;
 }
 
@@ -96,6 +97,7 @@ int binary_expr::gencode(){
 		break;
 	}
 	_reg -> setfree(r);
+	cout << codestr << endl;
 	return l;
 }
 
@@ -112,6 +114,7 @@ int leaf_node_value::gencode(){
 		;
 	}
 	_reg -> setflag(k);
+	cout << codestr << endl;
 	return k;
 }
 
@@ -122,12 +125,13 @@ int record_node_value::gencode(){
 	switch(off.second){
 	case INT_TYPE:
 		codestr = "mov ebp, esp";
-		codestr += "\nmov " + _reg -> finde(k) + ", [bp - " + itoa(off.first) + "]";
+		codestr += "\nmov " + _reg -> finde(k) + ", [ebp + " + itoa(off.first) + "]";
 		break;
 	case REAL_TYPE:
 		;
 	}
 	_reg -> setflag(k);
+	cout << codestr << endl;
 	return k;
 }
 
@@ -164,19 +168,18 @@ bool binary_expr::expr_value_type(){
 bool id_node_value::expr_value_type(){
 	
 }
-
 int id_node_value::gencode(){
 	auto _reg = reg::single();
 	auto off = enviroment::single() -> top() -> v_r -> search(id);
-	cout << off.second << endl;
 	int k = _reg -> findfree();
 	switch(off.second){
 	case INT_TYPE:
 		codestr = "mov ebp, esp";
-		codestr += "\nmov " + _reg -> finde(k) + ", [bp - " + itoa(off.first) + "]";
+		codestr += "\nmov " + _reg -> finde(k) + ", [ebp + " + itoa(off.first) + "]";
 		break;
 	}
 	_reg -> setflag(k);
+	cout << codestr << endl;
 	return k;
 }
 

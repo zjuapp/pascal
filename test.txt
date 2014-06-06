@@ -15,8 +15,10 @@ var
 		b,d:int;
 	end;	
 	t:int;
-
-function add(a,b:int),int;
+	arr:array [1..10] of
+	int;
+	fuck:int;
+function add(var a,b:int),int;
 begin
 	add := a + b;
 end
@@ -25,5 +27,13 @@ begin
 	a := 3 + 2;
 	t := 4;
 	t := 4;
+	arr[2] := 5;
+	add (a : t);
+	if a > 3 then
+		t := t + 1
+	else
+		t := t - 1;
+	for a := 1 to 10 do	
+		t := t + 1;
 end
 .

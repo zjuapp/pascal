@@ -80,3 +80,4 @@ shared_ptr <routine> enviroment::searchfunc(const string & id){
 void enviroment::clear(){
 	q.clear();
 }
+

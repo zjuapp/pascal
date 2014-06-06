@@ -631,6 +631,7 @@ for_stmt : FOR ID ASSIGN expression direction expression DOO stmt {
 		tmp -> end.reset($6);
 		tmp -> start.reset($4);
 		tmp -> dic = $5;
+		tmp -> stmt.reset($8);
 		$$ = tmp;
 	}
 		;

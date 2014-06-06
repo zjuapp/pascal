@@ -33,6 +33,18 @@ public:
 			return 4;
 		}
 	}
+	static int size(int  _type_id){
+		switch(_type_id){
+		case INT_TYPE:
+			return 4;
+		case REAL_TYPE:
+			return 4;
+		case CHAR_TYPE:
+			return 1;
+		case STR_TYPE:
+			return 4;
+		}
+	}
 };
 typedef shared_ptr <base_type> type_ptr;
 union value_set{

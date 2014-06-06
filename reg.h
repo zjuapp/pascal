@@ -52,4 +52,16 @@ public:
 		for(int i  = 0; i < REG_SIZE; ++i)
 			flag[i] = false;
 	}
+	void setesi(){
+		flag[0] = true;
+	}
+	void freeesi(){
+		flag[0] = false;
+	}
+	void setcx(){
+		flag[3] = true;
+	}
+	void freecx(){
+		flag[3] = false;
+	}
 };
