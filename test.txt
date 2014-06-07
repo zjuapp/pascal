@@ -1,6 +1,6 @@
 program hello;
 const
-	cn = 123;
+	cn = 2;
 	dn = 123.23;
 
 type
@@ -38,7 +38,7 @@ begin
 	;
 	case i % 4 of
 		0, j.b := 0;
-		1, j.b := 1;
+		cn, j.b := 1;
 		2, j.b := 2;
 		3, j.b := 3;
 	end

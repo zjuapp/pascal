@@ -1,3 +1,4 @@
+sub esp, 12
 xor esi,esi
 mov esi, 4
 mov ebp, esp
@@ -16,19 +17,18 @@ pop eax
 shr eax, 7
 and eax, 1
 mov esi, eax
-
 cmp esi, 0
-jz d
+jz caab
 xor esi,esi
 mov esi, 0
-
-mov ecx, esi
-f:
+mov ebp, esp
+mov [ebp + 8], esi
+eaab:
 xor esi,esi
 mov esi, 10
-
-cmp ecx, esi
-jz g
+mov eax, [ebp + 8]
+cmp eax, esi
+jz faab
 mov ebp, esp
 mov esi, [ebp + 4]
 xor edi,edi
@@ -36,15 +36,13 @@ mov edi, 4
 add esi, edi
 mov ebp, esp
 mov [ebp + 4], esi
-
-add ecx, 1
-jmp f
-g:;
-
-jmp e
-d:
-
-h:
+mov eax, [ebp + 8]
+add eax, 1
+mov [ebp + 8], eax
+jmp eaab
+faab:jmp daab
+caab:
+gaab:
 mov ebp, esp
 mov esi, [ebp + 4]
 xor edi,edi
@@ -55,9 +53,8 @@ pop eax
 shr eax, 7
 and eax, 1
 mov esi, eax
-
 cmp esi, 0
-jz i
+jz haab
 mov ebp, esp
 mov esi, [ebp + 4]
 xor edi,edi
@@ -65,14 +62,10 @@ mov edi, 1
 sub esi, edi
 mov ebp, esp
 mov [ebp + 4], esi
-jmp h
-i:;
-e:
-;
-c:
-
-j:
-mov ebp, esp
+jmp gaab
+haab:;daab:
+baab:
+iaab:mov ebp, esp
 mov esi, [ebp + 4]
 xor edi,edi
 mov edi, 10
@@ -96,10 +89,8 @@ pop eax
 shr eax, 7
 and eax, 1
 mov esi, eax
-
 cmp esi, 0
-jnz k
-k:;
+jz iaab
 mov ebp, esp
 mov esi, [ebp + 8]
 xor edi,edi
@@ -107,41 +98,43 @@ mov edi, 4
 mov eax, esi
 idiv edi
 mov esi, edx
-
 cmp esi, 0
-jz l
-cmp esi, 1
-jz m
+jz jaab
 cmp esi, 2
-jz n
+jz kaab
+cmp esi, 2
+jz laab
 cmp esi, 3
-jz o
-l:
+jz maab
+
+jaab:
 xor esi,esi
 mov esi, 0
 mov ebp, esp
 mov [ebp + 0], esi
-jmp p
-m:
+jmp naab
+kaab:
 xor esi,esi
 mov esi, 1
 mov ebp, esp
 mov [ebp + 0], esi
-jmp p
-n:
+jmp naab
+laab:
 xor esi,esi
 mov esi, 2
 mov ebp, esp
 mov [ebp + 0], esi
-jmp p
-o:
+jmp naab
+maab:
 xor esi,esi
 mov esi, 3
 mov ebp, esp
 mov [ebp + 0], esi
-jmp p
-p:;
-jmp c
+jmp naab
+naab:;
+jmp baab
+mov ah, 4ch
+int 21h
 outer_add:
 mov ebp, esp
 mov esi, [ebp + 12]

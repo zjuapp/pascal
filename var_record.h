@@ -18,4 +18,11 @@ public:
 	pair <int, int> search(const string & id, int index);
 	pair <int, int> search(const string & id, const string & member);
 	void gencode();
+	int getsize(){
+		int _s = 0;
+		for(auto i = vt.begin(); i != vt.end(); ++i){
+			_s += i -> second -> getsize();
+		}
+		return _s;
+	}
 };

@@ -224,56 +224,51 @@ void arr_assign::gencode(){
 }
 void if_stmt::gencode(){
 	base_stmt::gencode();
-	codestr = "";
 	int k = judge -> gencode();
 	string a1 = labelmanager::genlabel();
 	string a2 = labelmanager::genlabel();
-	codestr += "\ncmp " + reg::single() -> finde(k) + ", 0";
+	cout << "cmp " + reg::single() -> finde(k) + ", 0" << endl;
 	reg::single() -> setfree(k);	
-	codestr += "\njz " + a1;
-	cout << codestr << endl;
-	codestr = "";
+	cout << "jz " + a1 << endl;
 	lchild -> gencode();
-	codestr += "\njmp " + a2;
-	codestr += "\n" + a1 + ":";
+	cout << "jmp " + a2 << endl;
+	cout << a1 + ":" << endl;
 	if(rchild == nullptr){
-		codestr += "\n;";
 	}
 	else{
-		cout << codestr << endl;
-		codestr = "";
 		rchild -> gencode();
 	}
-	codestr += "\n" + a2 + ":\n;";
-	cout << codestr << endl;
+	cout << a2 << ":" << endl;
 }
 void for_stmt::gencode(){
 	base_stmt::gencode();
+	auto off = enviroment::single() -> search(id);
 	auto _reg = reg::single();
 	_reg -> clear();
 	int k = start -> gencode();
+	cout << "mov ebp, esp" << endl;
+	cout << "mov [ebp + " << off.first << "], " + _reg -> finde(k) << endl;
 	string loop = labelmanager::genlabel();
 	string break_place = labelmanager::genlabel();
-	codestr += "\nmov ecx, " +  _reg -> finde(k);
-	_reg -> setcx();
 	_reg -> setfree(k);
-	codestr += "\n" + loop + ":";
-	cout << codestr << endl;
-	codestr = "";
+	cout << loop + ":" << endl;
 	int w = end -> gencode();
-	codestr += "\ncmp ecx, " + _reg -> finde(w);
-	codestr += "\njz " + break_place;
-	cout << codestr << endl;
-	codestr = "";
+	cout << "mov eax, [ebp + " << off.first  << "]" << endl;
+	cout << "cmp eax, " + _reg -> finde(w) << endl;
+	cout << "jz " + break_place << endl;
 	stmt -> gencode();
 	if(dic){
-		codestr += "\nsub ecx, 1";
+		cout << "mov eax, [ebp + " << off.first << "]" << endl; 
+		cout << "sub eax, 1" << endl;
+		cout << "mov [ebp + " << off.first << "], eax" << endl; 
 	}
-	else
-		codestr += "\nadd ecx, 1";
-	codestr += "\njmp " + loop;
-	codestr += "\n" + break_place + ":;";
-	cout << codestr << endl;
+	else{
+		cout << "mov eax, [ebp + " << off.first << "]" << endl; 
+		cout << "add eax, 1" << endl;
+		cout << "mov [ebp + " << off.first << "], eax" << endl;
+	}
+	cout << "jmp " + loop << endl;
+	cout << break_place + ":";
 }
 void while_stmt::gencode(){
 	base_stmt::gencode();
@@ -281,14 +276,11 @@ void while_stmt::gencode(){
 	_reg -> clear();
 	string loop =  labelmanager::genlabel();
 	string break_place = labelmanager::genlabel();
-	codestr += "\n" + loop + ":";
-	cout << codestr << endl;
-	codestr = "";
+	cout << loop + ":" << endl; 
 	int ju = judge -> gencode();
-	codestr += "\ncmp " + _reg -> finde(ju) + ", 0"; 
+	cout << "cmp " + _reg -> finde(ju) + ", 0" << endl;  
 	_reg -> setfree(ju);
-	codestr += "\njz " + break_place;
-	cout << codestr << endl;
+	cout << "jz " + break_place << endl;
 	stmt -> gencode();
 	cout << "jmp " + loop << endl;
 	cout << break_place + ":;";
@@ -305,9 +297,9 @@ void case_stmt::gencode(){
 	}
 	string over_label = labelmanager::genlabel();
 	for(int i = 0; i < case_list -> case_vt.size(); ++i){
-		codestr += "\ncmp " + _reg -> finde(lcmp) + ", " + value_set_to_str(case_list -> case_vt[i] -> value -> first -> gettype(),
-			case_list -> case_vt[i] -> value -> second);
-		codestr += "\njz " + label_vt[i];
+		cout << "cmp " + _reg -> finde(lcmp) + ", " + value_set_to_str(case_list -> case_vt[i] -> value -> first -> gettype(),
+			case_list -> case_vt[i] -> value -> second) << endl;
+		cout << "jz " + label_vt[i] << endl;
 	}
 	cout << codestr << endl;
 	for(int i = 0; i < case_list -> case_vt.size(); ++i){
@@ -323,19 +315,14 @@ void repeat_stmt::gencode(){
 	auto _reg = reg::single();
 	_reg -> clear();
 	string loop =  labelmanager::genlabel();
-	string break_place = labelmanager::genlabel();
-	codestr += "\n" + loop + ":";
-	cout << codestr << endl;
-	codestr = "";
+	cout << loop + ":";
 	for(int i = 0; i < stmt_vt -> vt.size(); ++i){
 		stmt_vt -> vt[i] -> gencode();
 	}
 	int ju = judge -> gencode();
-	codestr += "\ncmp " + _reg -> finde(ju) + ", 0"; 
+	cout << "cmp " + _reg -> finde(ju) + ", 0" << endl; 
 	_reg -> setfree(ju);
-	codestr += "\njnz " + break_place;
-	codestr += "\n" + break_place + ":;";
-	cout << codestr << endl;
+	cout << "jz " + loop << endl;
 }
 
 void goto_stmt::gencode(){
@@ -347,7 +334,6 @@ int func_node_value::gencode(){
 	func_stmt -> gencode();
 	int k = reg::single() -> findfree();
 	reg::single() -> setflag(k);
-	codestr =  "mov " +reg::single() -> finde(k) + ", eax";
-	cout << codestr << endl;
+	cout << "mov " +reg::single() -> finde(k) + ", eax";
 	return k;
 }

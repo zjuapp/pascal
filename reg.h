@@ -58,10 +58,4 @@ public:
 	void freeesi(){
 		flag[0] = false;
 	}
-	void setcx(){
-		flag[3] = true;
-	}
-	void freecx(){
-		flag[3] = false;
-	}
 };

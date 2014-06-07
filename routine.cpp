@@ -24,12 +24,19 @@ void procedure::gencode(){
 	routine::gencode();
 }
 void routine::gencode(){
+	if(type != FUNC_ROUTINE && type != PROC_ROUTINE){
+		cout << "sub esp, " << header -> v_r -> getsize() << endl;
+	}
 	enviroment::single() -> insert(this -> header.get());
 	for(int i = 0; i < stmt_vt -> vt.size(); ++i){
 		stmt_vt -> vt[i] -> gencode();
 	}
 	if(type == FUNC_ROUTINE || type == PROC_ROUTINE){
 		cout << "ret" << endl;
+	}
+	else{
+		cout << "mov ah, 4ch" << endl;
+		cout << "int 21h" << endl;
 	}
 	for(int i = 0; i < header -> r_r -> vt.size(); ++i){
 		header -> r_r -> vt[i] -> gencode();

@@ -17,7 +17,7 @@ public:
 			mp[i] = genlabel();
 	}
 	static string genlabel(){
-		static int x = 1;
+		static int x = 26 * 26 * 26;
 		++x;
 		int t = x;
 		string res = "";
