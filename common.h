@@ -56,14 +56,3 @@ inline string ftoa(double x){
 	sprintf(real, "%.2f", x);
 	return string(real);
 }
-inline string genlabel(){
-	static int x = 1;
-	++x;
-	int t = x;
-	string res = "";
-	while(t){
-		res += t % 26 + 'a';
-		t /= 26;
-	}
-	return res;
-}

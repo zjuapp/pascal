@@ -1,12 +1,18 @@
 #pragma once
 #include "expr.h"
+#include "labelmanager.h"
 class base_stmt{
 public:
 	string codestr;
+	int label;
 	base_stmt(){
-		codestr = UNDEFINE_EXPR;
+		codestr = "";
+		label = -1;
 	}
 	virtual void gencode(){
+		if(label != -1){
+			cout << labelmanager::searchlabel(label) << ":" << endl;
+		}
 	}
 	virtual void emitcode(){
 		cout << codestr << endl;
@@ -121,7 +127,6 @@ public:
 	}	
 	void gencode();
 };
-
 class repeat_stmt: public base_stmt{
 public:
 	shared_ptr <stmt_list> stmt_vt;
@@ -135,27 +140,13 @@ public:
 		cout << "judge" << endl;
 		judge -> gencode();
 	}
+	void gencode();
 };
 
 class case_expr{
 public:
-	shared_ptr <base_stmt> stmt;
-	virtual void debug(){
-
-	}
-};
-
-class case_expr_id : public case_expr{
-public:
-	string id;
-	void debug(){
-		cout << id << endl;
-	}
-};
-
-class case_expr_const: public case_expr{
-public:
 	shared_ptr <key_value_tuple> value;
+	shared_ptr <base_stmt> stmt;
 	void debug(){
 		cout << value_set_to_str(value -> first -> gettype(),
 			value -> second) << endl;
@@ -185,6 +176,7 @@ public:
 class goto_stmt:public base_stmt{
 public:
 	int addr;//address to go
+	void gencode();
 };
 
 class proc_stmt: public base_stmt{
@@ -194,5 +186,16 @@ public:
 	void debug();
 	void gencode();
 };
+
+class func_node_value: public base_expr{
+public:
+	shared_ptr <proc_stmt> func_stmt;
+	func_node_value(){
+		type = FUNC_EXPR_TYPE;
+	}
+	int gencode();
+};
+
+
 
 

@@ -28,6 +28,9 @@ void routine::gencode(){
 	for(int i = 0; i < stmt_vt -> vt.size(); ++i){
 		stmt_vt -> vt[i] -> gencode();
 	}
+	if(type == FUNC_ROUTINE || type == PROC_ROUTINE){
+		cout << "ret" << endl;
+	}
 	for(int i = 0; i < header -> r_r -> vt.size(); ++i){
 		header -> r_r -> vt[i] -> gencode();
 	}

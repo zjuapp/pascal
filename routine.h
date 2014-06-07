@@ -4,6 +4,7 @@
 #include "var_record.h"
 #include "stmt.h"
 #include "type_value.h"
+#include "labelmanager.h"
 #define FUNC_ROUTINE "func_routine"
 #define PROC_ROUTINE "proc_routine"
 

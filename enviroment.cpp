@@ -71,7 +71,7 @@ shared_ptr <routine> enviroment::searchfunc(const string & id){
 	for(int i = l - 1; i >= 0; --i){
 		for(int j = 0; j < q[i] -> r_r -> vt.size(); ++j){
 			if(q[i] -> r_r -> vt[j] -> name == id){
-				return q[i] -> r_r -> vt[i];
+				return q[i] -> r_r -> vt[j];
 			}
 		}
 	}
@@ -80,4 +80,13 @@ shared_ptr <routine> enviroment::searchfunc(const string & id){
 void enviroment::clear(){
 	q.clear();
 }
-
+key_value_tuple enviroment::searchconst(const string & id){
+	int l = q.size();
+	key_value_tuple res;
+	for(int i = l - 1; i >= 0; --i){
+		res = q[i] -> c_r -> const_replace(id);
+		if(res.first != nullptr)
+			return res;
+	}
+	return res;
+}

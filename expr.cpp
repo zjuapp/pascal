@@ -188,5 +188,6 @@ bool arr_node_value::expr_value_type(){
 }
 
 int arr_node_value::gencode(){
-	return 3;
+	
 }
+

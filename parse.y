@@ -258,7 +258,6 @@ simple_type_decl : SYS_TYPE
 		}
 		else
 			if(strcmp($1, "real") == 0){
-				cout << "fuck real" <<endl;
 				$$ = new base_type(REAL_TYPE);
 			}
 			else
@@ -466,8 +465,18 @@ factor: ID {
 		tmp -> id = $1;
 		$$ = tmp;
 	}
-	| ID LP arg_list RP 
-	| LP expression RP
+	| ID LP args_list RP{
+          	proc_stmt * tmp= new proc_stmt();
+          	tmp -> proc_id = $1;
+          	tmp -> param = *$3;
+          	delete $3;
+          	func_node_value * tmp2 = new func_node_value();
+          	tmp2 -> func_stmt.reset(tmp);
+	    	$$ = tmp2;  
+	    }
+	| LP expression RP{
+		$$ = $2;
+	}
 	| NOT factor{
 		unary_expr * tmp = new unary_expr();
 		tmp -> child.reset($2);
@@ -530,14 +539,16 @@ stmt_list: stmt_list stmt SEMI{
 		$1 -> vt.push_back(tmp);
 		$$ = $1;
 	}
-	|stmt SEMI{
+	|
+	{
 		$$ = new stmt_list();
-		shared_ptr<base_stmt> tmp($1);
-		$$ -> vt.push_back(tmp);
 	}
 	;
 
 stmt: INTEGER COLON non_label_stmt{
+		$$ = $3;
+		$$ -> label = $1;
+		labelmanager::store($1);
 	} | non_label_stmt{
 	}
 
@@ -546,7 +557,6 @@ non_label_stmt:
 		$$ = $1;
 	}
 	| if_stmt{
-
 		$$ = $1;
 	}
 	| repeat_stmt{
@@ -666,14 +676,18 @@ case_expr_list : case_expr_list  case_expr{
 
 case_expr : const_value
  COLON stmt SEMI{	
-		case_expr_const * tmp = new case_expr_const();
+		case_expr * tmp = new case_expr();
 		tmp -> value.reset($1);
 		tmp -> stmt.reset($3);
 		$$ = tmp;
 	}
 		| ID COLON stmt SEMI{
-			case_expr_id * tmp = new case_expr_id();
-			tmp -> id = $1;
+			auto res = enviroment::single() -> searchconst($1);
+			case_expr * tmp = new case_expr();
+			key_value_tuple * tp = new key_value_tuple();
+			tp -> first = res.first;
+			tp -> second = res.second;
+			tmp -> value.reset(tp);
 			tmp -> stmt.reset($3);
 			$$ = tmp;
 		}
@@ -757,13 +771,13 @@ para_decl_list : para_decl_list  SEMI para_type_list {
 		;
 
 para_type_list : var_para_list COMMA  simple_type_decl{
-		$$ = new pair<int, pair <vector <string>, type_ptr> >();
+			$$ = new pair<int, pair <vector <string>, type_ptr> >();
 			$$ -> first = 1;
 			$$ -> second.first = *$1;
 			$$ -> second.second.reset($3);
 		}
 		| val_para_list COMMA simple_type_decl{
-		$$ = new pair<int, pair <vector <string>, type_ptr> >();
+			$$ = new pair<int, pair <vector <string>, type_ptr> >();
 			$$ -> first = 0; 
 			$$ -> second.first = *$1;
 			$$ -> second.second.reset($3);
@@ -776,8 +790,6 @@ var_para_list : VAR name_list{
 		;
 
 val_para_list : name_list{
-puts("6");
-
 		$$ = $1;
 	}
 		;
@@ -803,8 +815,7 @@ void yyerror(char * s){
 }
 int main()
 {
-	freopen("out.txt", "w", stdout);
-	printf("%d\n", yyparse());
+	yyparse();
 }
 
 

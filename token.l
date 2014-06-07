@@ -27,6 +27,7 @@ ge ">="
 gt ">"
 le "<="
 lt "<" 
+mod "%"
 sys_proc read|write
 function "function"
 equal "="
@@ -65,6 +66,7 @@ procedure "procedure"
 {sys_type} {yylval._str = strdup(yytext);return SYS_TYPE;}
 {record} {return RECORD;}
 {casee} {return CASEE;}
+{mod} {return MOD;}
 {iff} {return IFF;}
 {doo} {return DOO;}
 {elsee} {return ELSEE;}

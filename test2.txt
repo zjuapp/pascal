@@ -1,0 +1,42 @@
+program hello;
+const
+	a = 'a';
+	b = 'sad';
+	c = 123;
+	d = 123.23;
+
+type
+	c = int;
+	b = int;
+var 
+	a:int;
+	c:record
+		a:int;
+		b,d:int;
+	end;	
+	t:int;
+	arr:array [1..10] of
+	int;
+	fuck:int;
+	aa:int;
+	bb:int;
+function outer_add(a,b:int),int;
+
+function inner_add(a,b:int),int;
+begin
+	inner_add := a + b;
+end
+;
+
+begin
+	a := inner_add(a : b);
+	outer_add := a + b;
+end
+;
+
+begin
+	aa := 2;
+	bb := 3;
+	aa := outer_add (aa : bb);
+end
+.

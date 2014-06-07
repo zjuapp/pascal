@@ -1,9 +1,11 @@
 LEX=flex
 YACC=yacc
 CC=g++ -std=c++11
-a.out:common.o lex.yy.o y.tab.o expr.o stmt.o enviroment.o var_record.o routine.o
-	$(CC) routine.o stmt.o common.o expr.o  var_record.o enviroment.o lex.yy.o y.tab.o -o a.out
-common.o: 
+a.out:common.o labelmanager.o lex.yy.o y.tab.o expr.o stmt.o enviroment.o var_record.o routine.o
+	$(CC) labelmanager.o routine.o stmt.o common.o expr.o  var_record.o enviroment.o lex.yy.o y.tab.o -o a.out
+labelmanager.o:labelmanager.cpp
+	$(CC) -c labelmanager.cpp
+common.o: common.cpp
 	$(CC) -c common.cpp
 lex.yy.o:lex.yy.c y.tab.h
 	$(CC) -c lex.yy.c

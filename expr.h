@@ -2,6 +2,7 @@
 #include "common.h"
 #include "type_value.h"
 #include "var_record.h"
+#include "labelmanager.h"
 #define UNDEFINE_EXPR "undefine_expr"
 #define BASE_EXPR_TYPE "base_type"
 #define UNARY_EXPR_TYPE "unary_type"
@@ -10,6 +11,7 @@
 #define ID_EXPR_TYPE "id_node_value"
 #define RECORD_EXPR_TYPE "record_node_value"
 #define ARR_EXPR_TYPE "arr_node_value"
+#define FUNC_EXPR_TYPE "func_node_value"
 class base_expr{
 public:
 	string codestr;
@@ -148,3 +150,5 @@ public:
 		cout << codestr << endl;
 	}
 };
+
+

@@ -1,39 +1,48 @@
 program hello;
 const
-	a = 'a';
-	b = 'sad';
-	c = 123;
-	d = 123.23;
+	cn = 123;
+	dn = 123.23;
 
 type
 	c = int;
 	b = int;
 var 
-	a:int;
-	c:record
-		a:int;
-		b,d:int;
-	end;	
-	t:int;
-	arr:array [1..10] of
-	int;
-	fuck:int;
-function add(var a,b:int),int;
+	i : int;
+	j : record
+		a : int;
+		b :int;
+	end;
+
+function outer_add(a,b:int),int;
+
+
 begin
-	add := a + b;
+	outer_add := a + b;
 end
-;
+;	
+	
 begin
-	a := 3 + 2;
-	t := 4;
-	t := 4;
-	arr[2] := 5;
-	add (a : t);
-	if a > 3 then
-		t := t + 1
+	j.a := 4;
+	i := 0;
+	if j.a > 3 then
+		for i := 0 to 10 do
+			j.a := j.a + 4
 	else
-		t := t - 1;
-	for a := 1 to 10 do	
-		t := t + 1;
+		while j.a > 1 do
+			j.a := j.a - 1
+	;
+	3,repeat
+		j.a := j.a - 10;
+		i := i + 1;
+	until i > 10
+	;
+	case i % 4 of
+		0, j.b := 0;
+		1, j.b := 1;
+		2, j.b := 2;
+		3, j.b := 3;
+	end
+	;
+	goto 3;
 end
 .
