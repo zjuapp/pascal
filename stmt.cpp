@@ -269,7 +269,27 @@ void for_stmt::gencode(){
 	cout << codestr << endl;
 }
 void while_stmt::gencode(){
-
+/* 	shared_ptr <base_expr> judge;
+	shared_ptr <base_stmt> stmt; */
+	auto _reg = reg::single();
+	_reg -> clear();
+	string while_label=genlabel();
+	string endwhile_label=genlabel();
+	
+	cout<<while_label+":\n";//开始循环体标签
+	//判断循环条件
+	int k = judge -> gencode();//计算判断条件保存在寄存器“k”中
+	codestr="mov ecx, "+_reg -> finde(k)+"\n";
+	_reg -> setcx();
+	_reg -> setfree(k);
+	codestr+="cmp ecx,01\n";//判断条件是否为true
+	cosestr+="jne "+endwhile_label+"\n";//条件不成立
+	cout<<codestr;
+	//执行循环体
+	stmt->gencode();
+	cout<<"\n";
+	cout<<"jmp "+while_label+"\n";
+	cout<<endwhile_label+":\n";//结束循环体标签
 }
 
 void case_stmt::gencode(){
