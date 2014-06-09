@@ -6,11 +6,26 @@ void record_assign::gencode(){
 	auto _reg = reg::single();
 	_reg -> clear();
 	int k  = value -> gencode();
-	auto in = enviroment::single() -> search(id, member);
-	codestr = "mov ebp, esp";
-	codestr += "\nmov [ebp + " + itoa(in.first) + "], " + _reg -> finde(k);
-	cout  << codestr << endl;
-	_reg -> setfree(k);
+	auto in = enviroment::single() -> top() -> v_r -> search(id, member);
+	if(in.first == -1){	
+		auto in2 = enviroment::single() -> search(id, member);
+		if(in2.first == -1){
+			cout << id << " " << member << " not found" << endl;
+			return;
+		}
+		else{
+			codestr = "mov bp, sp";
+			codestr += "\nmov [bp + si + " + itoa(in.first) + "], " + _reg -> finde(k);
+			cout  << codestr << endl;
+			_reg -> setfree(k);
+		}
+	}
+	else{
+		codestr = "mov bp, sp";
+		codestr += "\nmov [bp + " + itoa(in.first) + "], " + _reg -> finde(k);
+		cout  << codestr << endl;
+		_reg -> setfree(k);
+	}
 }
 void normal_assign::gencode(){
 	base_stmt::gencode();
@@ -214,7 +229,7 @@ void arr_assign::gencode(){
 		reg::single() -> setfree(k);
 		codestr += "\nmov esi, " + reg::single() -> finde(k);
 	}
-	reg::single() -> setesi();
+	reg::single() -> setsi();
 	codestr += "\nimul esi, " + itoa(base_type::size(offset.second));
 	int v = value -> gencode();
 	codestr += "\nmov ebp, esp\n";

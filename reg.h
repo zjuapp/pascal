@@ -29,7 +29,8 @@ public:
 		return vt[i];
 	}
 	string finde(int i){
-		string res = "e";
+		string res = "";
+		//string res = "e";
 		res += vt[i];
 		return res;
 	}
@@ -52,10 +53,10 @@ public:
 		for(int i  = 0; i < REG_SIZE; ++i)
 			flag[i] = false;
 	}
-	void setesi(){
+	void setsi(){
 		flag[0] = true;
 	}
-	void freeesi(){
+	void freesi(){
 		flag[0] = false;
 	}
 };

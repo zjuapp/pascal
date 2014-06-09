@@ -1,6 +1,7 @@
 #include "routine.h"
 #include "enviroment.h"
 #include "common.h"
+#include "reg.h"
 void func::gencode(){
 	cout << name << ":" << endl;
 	for(int i = 0; i < param.size(); ++i){//reload the pass by address
@@ -51,7 +52,6 @@ void routine::add_function_param(){
 void procedure::add_function_param(){
 	int l = param.size();
 	shared_ptr <base_type> tmp(new base_type(INT_TYPE));
-	header -> v_r -> insert_front("~nop1", tmp);
 	header -> v_r -> insert_front("~nop2", tmp);
 	for(int i = l - 1; i >= 0; --i){
 		header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
@@ -59,9 +59,9 @@ void procedure::add_function_param(){
 	routine::add_function_param();
 }
 void func::add_function_param(){
+	reg::single() -> setsi();
 	int l = param.size();
 	shared_ptr <base_type> tmp(new base_type(INT_TYPE));
-	header -> v_r -> insert_front("~nop1", tmp);
 	header -> v_r -> insert_front("~nop2", tmp);
 	for(int i = l - 1; i >= 0; --i){
 		header -> v_r -> insert_front(param[i].second.first, param[i].second.second);

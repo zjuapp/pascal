@@ -1,146 +1,49 @@
-sub esp, 12
-xor esi,esi
-mov esi, 4
-mov ebp, esp
-mov [ebp + 4], esi
-xor esi,esi
-mov esi, 0
-mov ebp, esp
-mov [ebp + 8], esi
-mov ebp, esp
-mov esi, [ebp + 4]
-xor edi,edi
-mov edi, 3
-cmp edi, esi
-pushf
-pop eax
-shr eax, 7
-and eax, 1
-mov esi, eax
-cmp esi, 0
-jz caab
-xor esi,esi
-mov esi, 0
-mov ebp, esp
-mov [ebp + 8], esi
-eaab:
-xor esi,esi
-mov esi, 10
-mov eax, [ebp + 8]
-cmp eax, esi
-jz faab
-mov ebp, esp
-mov esi, [ebp + 4]
-xor edi,edi
-mov edi, 4
-add esi, edi
-mov ebp, esp
-mov [ebp + 4], esi
-mov eax, [ebp + 8]
-add eax, 1
-mov [ebp + 8], eax
-jmp eaab
-faab:jmp daab
-caab:
-gaab:
-mov ebp, esp
-mov esi, [ebp + 4]
-xor edi,edi
-mov edi, 1
-cmp edi, esi
-pushf
-pop eax
-shr eax, 7
-and eax, 1
-mov esi, eax
-cmp esi, 0
-jz haab
-mov ebp, esp
-mov esi, [ebp + 4]
-xor edi,edi
-mov edi, 1
-sub esi, edi
-mov ebp, esp
-mov [ebp + 4], esi
-jmp gaab
-haab:;daab:
+sub sp, 8
+xor si,si
+mov si, 0
+mov bp, sp
+mov [bp + 0], si
+xor si,si
+mov si, 0
+mov bp, sp
+mov [bp + 4], si
 baab:
-iaab:mov ebp, esp
-mov esi, [ebp + 4]
-xor edi,edi
-mov edi, 10
-sub esi, edi
-mov ebp, esp
-mov [ebp + 4], esi
-mov ebp, esp
-mov esi, [ebp + 8]
-xor edi,edi
-mov edi, 1
-add esi, edi
-mov ebp, esp
-mov [ebp + 8], esi
-mov ebp, esp
-mov esi, [ebp + 8]
-xor edi,edi
-mov edi, 10
-cmp edi, esi
-pushf
-pop eax
-shr eax, 7
-and eax, 1
-mov esi, eax
-cmp esi, 0
-jz iaab
-mov ebp, esp
-mov esi, [ebp + 8]
-xor edi,edi
-mov edi, 4
-mov eax, esi
-idiv edi
-mov esi, edx
-cmp esi, 0
-jz jaab
-cmp esi, 2
-jz kaab
-cmp esi, 2
-jz laab
-cmp esi, 3
-jz maab
+xor si,si
+mov si, 10
+mov ax, [bp + 4]
+cmp ax, si
+jz caab
+mov bp, sp
+mov bp, sp
+mov di, [bp + 0]
 
-jaab:
-xor esi,esi
-mov esi, 0
-mov ebp, esp
-mov [ebp + 0], esi
-jmp naab
-kaab:
-xor esi,esi
-mov esi, 1
-mov ebp, esp
-mov [ebp + 0], esi
-jmp naab
-laab:
-xor esi,esi
-mov esi, 2
-mov ebp, esp
-mov [ebp + 0], esi
-jmp naab
-maab:
-xor esi,esi
-mov esi, 3
-mov ebp, esp
-mov [ebp + 0], esi
-jmp naab
-naab:;
+mov [bp - 8], di
+mov bp, sp
+mov di, [bp + 4]
+
+mov [bp - 12], di
+sub sp, 12
+call outer_add
+add sp, 8
+move bp, sp
+mov ax, [bp]
+add sp, 4
+mov di, ax
+mov bp, sp
+mov [bp + 0], di
+mov ax, [bp + 4]
+add ax, 1
+mov [bp + 4], ax
 jmp baab
+caab:
 mov ah, 4ch
 int 21h
 outer_add:
-mov ebp, esp
-mov esi, [ebp + 12]
-mov ebp, esp
-mov edi, [ebp + 8]
-add esi, edi
-mov ebp, esp
-mov [ebp + 16], esi
+mov bp, sp
+mov di, [bp + 8]
+mov bp, sp
+mov bx, [bp + 4]
+add di, bx
+mov bp, sp
+mov [bp + 12], di
 ret
