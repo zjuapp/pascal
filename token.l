@@ -1,5 +1,6 @@
 %{
     #include "const_record.h"
+	#include "string_data.h"
     #include "type_record.h"
 	#include "var_record.h"
 	#include "stmt.h"
@@ -28,6 +29,7 @@ gt ">"
 le "<="
 lt "<" 
 mod "%"
+writeln "writeln"
 sys_proc read|write
 function "function"
 equal "="
@@ -62,6 +64,7 @@ procedure "procedure"
 
 {const}  {return CONST;}
 {function} {return FUNCTION;}
+{writeln} {return WRITELN;}
 {program} {return PROGRAM;}
 {sys_type} {yylval._str = strdup(yytext);return SYS_TYPE;}
 {record} {return RECORD;}

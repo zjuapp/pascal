@@ -4,7 +4,6 @@ class reg{
 private:
 	void init(){
 		vt.clear();
-		vt.push_back("si");
 		vt.push_back("di");
 		vt.push_back("bx");
 		vt.push_back("cx");
@@ -29,7 +28,7 @@ public:
 		return vt[i];
 	}
 	string finde(int i){
-		string res = "";
+		string res = "e";
 		//string res = "e";
 		res += vt[i];
 		return res;
@@ -52,11 +51,5 @@ public:
 		//why can't memset??
 		for(int i  = 0; i < REG_SIZE; ++i)
 			flag[i] = false;
-	}
-	void setsi(){
-		flag[0] = true;
-	}
-	void freesi(){
-		flag[0] = false;
 	}
 };

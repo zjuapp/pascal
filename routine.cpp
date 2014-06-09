@@ -2,6 +2,7 @@
 #include "enviroment.h"
 #include "common.h"
 #include "reg.h"
+#include "string_data.h"
 void func::gencode(){
 	cout << name << ":" << endl;
 	for(int i = 0; i < param.size(); ++i){//reload the pass by address
@@ -26,7 +27,13 @@ void procedure::gencode(){
 }
 void routine::gencode(){
 	if(type != FUNC_ROUTINE && type != PROC_ROUTINE){
+		cout << "section .data\n";
+		string_data::single() -> gencode();
+		cout << "section .text\n";
+		cout << "global main\n";
+		cout << "main:\n";
 		cout << "sub esp, " << header -> v_r -> getsize() << endl;
+		cout << "xor esi, esi" << endl;
 	}
 	enviroment::single() -> insert(this -> header.get());
 	for(int i = 0; i < stmt_vt -> vt.size(); ++i){
@@ -36,8 +43,9 @@ void routine::gencode(){
 		cout << "ret" << endl;
 	}
 	else{
-		cout << "mov ah, 4ch" << endl;
-		cout << "int 21h" << endl;
+		cout << "mov eax, 1\n";
+		cout << "mov ebx, 0\n";
+		cout << "int 80h\n";
 	}
 	for(int i = 0; i < header -> r_r -> vt.size(); ++i){
 		header -> r_r -> vt[i] -> gencode();
@@ -52,20 +60,21 @@ void routine::add_function_param(){
 void procedure::add_function_param(){
 	int l = param.size();
 	shared_ptr <base_type> tmp(new base_type(INT_TYPE));
-	header -> v_r -> insert_front("~nop2", tmp);
 	for(int i = l - 1; i >= 0; --i){
 		header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
 	}
+	header -> v_r -> insert_front("~nop2", tmp);
+	header -> v_r -> insert_front("~nop1", tmp);
 	routine::add_function_param();
 }
 void func::add_function_param(){
-	reg::single() -> setsi();
 	int l = param.size();
 	shared_ptr <base_type> tmp(new base_type(INT_TYPE));
-	header -> v_r -> insert_front("~nop2", tmp);
 	for(int i = l - 1; i >= 0; --i){
 		header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
 	}
 	header -> v_r -> insert_front(name, ret);
+	header -> v_r -> insert_front("~nop2", tmp);
+	header -> v_r -> insert_front("~nop1", tmp);//for esi
 	routine::add_function_param();
 }

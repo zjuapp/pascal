@@ -12,7 +12,8 @@
 	#include "enviroment.h"
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include <ctype.h>	
+	#include <ctype.h>
+	#include "string_data.h"	
 %}
 
 %union{
@@ -44,7 +45,7 @@
 	proc_stmt * _proc_stmt;
 }
 
-%token  LP RP LB RB DOT COMMA COLON MUL DIV PLUS MINUS ID GE GT LE LT EQUAL ASSIGN INTEGER REAL CHAR STRING CONST SEMI VAR PROGRAM TYPE SYS_TYPE RECORD ARRAY BP END BEGINN MOD UNEQUAL DR NOT AND CASEE IFF DOO TO DOWNTO UNTIL FOR WHILE ELSEE OF REPEAT GOTO THEN PROCEDURE FUNCTION SYS_PROC
+%token  LP RP LB RB DOT COMMA COLON MUL DIV PLUS MINUS ID GE GT LE LT EQUAL ASSIGN INTEGER REAL CHAR STRING CONST SEMI VAR PROGRAM TYPE SYS_TYPE RECORD ARRAY BP END BEGINN MOD UNEQUAL DR NOT AND CASEE IFF DOO TO DOWNTO UNTIL FOR WHILE ELSEE OF REPEAT GOTO THEN PROCEDURE FUNCTION SYS_PROC WRITELN
 
 %type <_str> ID
 %type <_tuple> const_value
@@ -74,6 +75,7 @@
 %type <_stmt> goto_stmt
 %type <_stmt> repeat_stmt
 %type <_stmt> case_stmt
+%type <_stmt> sys_stmt
 %type <_direction> direction
 %type <_stmt_list> stmt_list
 %type <_case_list> case_expr_list
@@ -514,18 +516,14 @@ factor: ID {
 		tmp -> value._double = $1;
 		$$ = tmp;
 	}
-	|CHAR{
-		leaf_node_value * tmp = new leaf_node_value();
-		tmp -> type_id = CHAR_TYPE;
-		tmp -> value._double = $1;
-		$$ = tmp;
-	}
 	|STRING{
+		string str = string_data::single() -> insert($1);
 		leaf_node_value * tmp = new leaf_node_value();
 		tmp -> type_id = STR_TYPE;
-		tmp -> value._str = $1;
+		tmp -> value._str = strdup(str.c_str());
 		$$ = tmp;
 	}
+
 	;
 
 arg_list: arg_list COMMA expression
@@ -581,6 +579,9 @@ non_label_stmt:
 	| proc_stmt {
 		$$ = $1;
 	}
+	| sys_stmt{
+
+	}
 	;
 
 assign_stmt: ID ASSIGN expression{
@@ -628,10 +629,10 @@ repeat_stmt : REPEAT stmt_list UNTIL expression{
 	}
 		;
 
-while_stmt : WHILE expression DOO stmt{
+while_stmt : WHILE expression DOO BEGINN stmt_list END{
 		while_stmt * tmp = new while_stmt();
 		tmp -> judge.reset($2);
-		tmp -> stmt.reset($4);
+		tmp -> stmt.reset($5);
 		$$ = tmp;
 	};
 
@@ -700,8 +701,7 @@ goto_stmt : GOTO INTEGER{
 	}
 	;
 
-proc_stmt : SYS_PROC
-          | ID{
+proc_stmt : ID{
           	$$ = new proc_stmt();
           	$$ -> proc_id = $1;
           }
@@ -713,6 +713,11 @@ proc_stmt : SYS_PROC
           }
           | SYS_PROC LP args_list RP
           ;
+sys_stmt : WRITELN LP expression RP{
+		sys_write_stmt * tmp = new sys_write_stmt();
+		tmp -> expr.reset($3);
+		$$ = tmp;
+	}
 args_list : args_list  COMMA  expression{
 	shared_ptr <base_expr> tmp($3);
 	$1 -> push_back(tmp);
@@ -817,8 +822,6 @@ int main()
 {
 	yyparse();
 }
-
-
  
 
 

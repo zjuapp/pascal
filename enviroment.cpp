@@ -65,17 +65,18 @@ pair<int, int> enviroment::search(const string & id, const string & member){
 	}
 	return make_pair(off, -1);
 }
-shared_ptr <routine> enviroment::searchfunc(const string & id){
+pair <shared_ptr <routine>, int> enviroment::searchfunc(const string & id){
 	int l = q.size();
 	int off = 0;
 	for(int i = l - 1; i >= 0; --i){
 		for(int j = 0; j < q[i] -> r_r -> vt.size(); ++j){
 			if(q[i] -> r_r -> vt[j] -> name == id){
-				return q[i] -> r_r -> vt[j];
+				return make_pair(q[i] -> r_r -> vt[j], off);
 			}
 		}
+		off += q[i] -> v_r -> getsize();
 	}
-	return nullptr;	
+	return make_pair(nullptr, -1);	
 }
 void enviroment::clear(){
 	q.clear();

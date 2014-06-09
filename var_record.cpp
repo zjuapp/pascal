@@ -11,6 +11,7 @@ bool var_record::insert_front(const string type_id, shared_ptr <base_type> type)
 		return false;
 	mp[type_id] = type;
 	vt.push_front(make_pair(type_id, type));
+
 	return true;
 }
 pair <int,int> var_record::search(const string & id){

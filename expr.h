@@ -43,6 +43,12 @@ public:
 	virtual void emitcode(){
 
 	}
+	virtual bool isstr(){
+		return false;
+	}
+	virtual bool isconststr(string & s){
+		return false;
+	}
 };
 
 class unary_expr: public base_expr{
@@ -88,6 +94,9 @@ public:
 	value_set value;
 	int type_id;
 	int gencode();
+	leaf_node_value(){
+		type = CONST_EXPR_TYPE;
+	}
 	bool expr_value_type(){
 		if(type_id == INT_TYPE)
 			return false;
@@ -99,6 +108,21 @@ public:
 	}
 	void emitcode(){
 		cout << codestr << endl;
+	}
+	bool isstr(){
+		if(type_id == STR_TYPE){
+			return true;
+		}
+		else
+			return false;
+	}
+	bool isconststr(string & s){
+		if(type_id == STR_TYPE){
+			s = value._str;
+			return true;
+		}
+		else
+			return false;
 	}
 }; 
 class record_node_value: public base_expr{
@@ -113,6 +137,7 @@ public:
 	bool isconst(){
 		return false;
 	}
+	bool isstr();
 	void emitcode(){
 		cout << codestr << endl;
 	}
@@ -129,6 +154,7 @@ public:
 	bool isconst(){
 		return false;
 	}
+	bool isstr();
 	void emitcode(){
 		cout << codestr << endl;
 	}
@@ -146,6 +172,7 @@ public:
 	bool isconst(){
 		return false;
 	}
+	bool isstr();
 	void emitcode(){
 		cout << codestr << endl;
 	}

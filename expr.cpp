@@ -32,65 +32,67 @@ int binary_expr::gencode(){
 		codestr = "sub " + _reg -> finde(l) +", " + _reg -> finde(r);
 		break;
 	case DIV_TYPE:
-		codestr  = "mov ax, " + _reg -> finde(l);
+		codestr  = "mov eax, " + _reg -> finde(l);
+		codestr += "\nxor edx, edx";
 		codestr += "\nidiv " + _reg -> finde(r);
-		codestr += "\nmov " + _reg -> finde(l) + ", ax";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
 		break;
 	case GE_TYPE:
 		codestr = "cmp " + _reg -> finde(l) + ", " + _reg -> finde(r);
 		codestr += "\npushf";
-		codestr += "\npop ax";
-		codestr += "\nshr ax, 7";
-		codestr += "\nand ax, 1";
-		codestr += "\nxor ax, 1";
-		codestr += "\nmov " + _reg -> finde(l) + ", ax";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 7";
+		codestr += "\nand eax, 1";
+		codestr += "\nxor eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
 		break;
 	case GT_TYPE:
 		codestr = "cmp " + _reg -> finde(r) + ", " + _reg -> finde(l);
 		codestr += "\npushf";
-		codestr += "\npop ax";
-		codestr += "\nshr ax, 7";
-		codestr += "\nand ax, 1";
-		codestr += "\nmov " + _reg -> finde(l) + ", ax";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 7";
+		codestr += "\nand eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
 		break;
 	case LE_TYPE:
 		codestr = "cmp " + _reg -> finde(r) + ", " + _reg -> finde(l);
 		codestr += "\npushf";
-		codestr += "\npop ax";
-		codestr += "\nshr ax, 7";
-		codestr += "\nand ax, 1";
-		codestr += "\nxor ax, 1";
-		codestr += "\nmov " + _reg -> finde(l) + ", ax";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 7";
+		codestr += "\nand eax, 1";
+		codestr += "\nxor eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
 		break;
 	case LT_TYPE:
 		codestr = "cmp " + _reg -> finde(l) + ", " + _reg -> finde(r);
 		codestr += "\npushf";
-		codestr += "\npop ax";
-		codestr += "\nshr ax, 7";
-		codestr += "\nand ax, 1";
-		codestr += "\nmov " + _reg -> finde(l) + ", ax";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 7";
+		codestr += "\nand eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
 		break;
 	case EQUAL_TYPE:
 		codestr = "cmp " + _reg -> finde(l) + ", " + _reg -> finde(r);
 		codestr += "\npushf";
 		codestr += "\npop eax";
-		codestr += "\nshr ax, 6";
-		codestr += "\nand ax, 1";
-		codestr += "\nmov " + _reg -> finde(l) + ", ax";
+		codestr += "\nshr eax, 6";
+		codestr += "\nand eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
 		break;
 	case MOD_TYPE:
-		codestr  = "mov ax, " + _reg -> finde(l);
+		codestr  = "mov eax, " + _reg -> finde(l);
+		codestr += "\nxor edx, edx";
 		codestr += "\nidiv " + _reg -> finde(r);
-		codestr += "\nmov " + _reg -> finde(l) + ", dx";
+		codestr += "\nmov " + _reg -> finde(l) + ", edx";
 		break;
 	case UNEQUAL_TYPE:
 		codestr = "cmp " + _reg -> finde(l) + ", " + _reg -> finde(r);
 		codestr += "\npushf";
-		codestr += "\npop ax";
-		codestr += "\nshr ax, 6";
-		codestr += "\nand ax, 1";
-		codestr += "\nxor ax, 1";
-		codestr += "\nmov " + _reg -> finde(l) + ", ax";
+		codestr += "\npop eax";
+		codestr += "\nshr eax, 6";
+		codestr += "\nand eax, 1";
+		codestr += "\nxor eax, 1";
+		codestr += "\nmov " + _reg -> finde(l) + ", eax";
 		break;
 	case AND_TYPE:
 		codestr = "and " + _reg -> finde(l) +", " + _reg -> finde(r);
@@ -122,27 +124,26 @@ int record_node_value::gencode(){
 	auto _reg = reg::single();
 	auto off = enviroment::single() -> top() -> v_r -> search(id, member);
 	int k;
-	if(off.first = -1){
+	if(off.second == -1){
 		auto off2 = enviroment::single() -> search(id, member);
-		if(off2.first == -1){
+		if(off2.second == -1){
 			cout << "id:" + id + " not found" << endl;
 		}
 		else{
 			k = _reg -> findfree();
-			switch(off.second){
-				case INT_TYPE:
-				cout << "mov bp, sp" << endl;
-				cout << "mov " + _reg -> finde(k) + ", [bp + si + " + itoa(off.first) + "]" << endl;
+			switch(off2.second){
+				cout << "mov ebp, esp" << endl;
+				cout << "mov " + _reg -> finde(k) + ", [ebp + esi + " + itoa(off2.first) + "]" << endl;
 				break;
 			}
+		_reg -> setflag(k);
 		}
 	}
 	else{
 		k = _reg -> findfree();
 		switch(off.second){
-			case INT_TYPE:
-			cout << "mov bp, sp" << endl;
-			cout << "mov " + _reg -> finde(k) + ", [bp + " + itoa(off.first) + "]" << endl;
+			cout << "mov ebp, esp" << endl;
+			cout << "mov " + _reg -> finde(k) + ", [ebp + " + itoa(off.first) + "]" << endl;
 			break;
 		}
 		_reg -> setflag(k);
@@ -180,36 +181,44 @@ bool binary_expr::expr_value_type(){
 	return type_id;
 }
 
-bool id_node_value::expr_value_type(){
-	
+bool id_node_value::expr_value_type(){	
+}
+bool record_node_value::isstr(){
+	auto off = enviroment::single() -> search(id, member);
+	if(off.second == STR_TYPE)
+		return true;
+	else
+	return false;
+}
+bool id_node_value::isstr(){
+	auto off = enviroment::single() -> search(id);
+	if(off.second == STR_TYPE)
+		return true;
+	else
+	return false;
+}
+bool arr_node_value::isstr(){
+	return false;
 }
 int id_node_value::gencode(){
 	auto _reg = reg::single();
 	auto off = enviroment::single() -> top() -> v_r -> search(id);
 	int k;
-	if(off.first = -1){
+	if(off.second == -1){
 		auto off2 = enviroment::single() -> search(id);
-		if(off2.first == -1){
+		if(off2.second == -1){
 			cout << "id:" + id + " not found" << endl;
 		}
 		else{
 			k = _reg -> findfree();
-			switch(off.second){
-				case INT_TYPE:
-				cout << "mov bp, sp" << endl;
-				cout << "mov " + _reg -> finde(k) + ", [bp + si + " + itoa(off.first) + "]" << endl;
-				break;
-			}
+			cout << "mov ebp, esp" << endl;
+			cout << "mov " + _reg -> finde(k) + ", [ebp + esi + " + itoa(off2.first) + "]" << endl;
 		}
 	}
 	else{
 		k = _reg -> findfree();
-		switch(off.second){
-			case INT_TYPE:
-			cout << "mov bp, sp" << endl;
-			cout << "mov " + _reg -> finde(k) + ", [bp + " + itoa(off.first) + "]" << endl;
-			break;
-		}
+		cout << "mov ebp, esp" << endl;
+		cout << "mov " + _reg -> finde(k) + ", [ebp + " + itoa(off.first) + "]" << endl;
 		_reg -> setflag(k);
 	}
 	return k;

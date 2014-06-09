@@ -12,37 +12,18 @@ var
 		a : int;
 		b :int;
 	end;
-
-function outer_add(a,b:int),int;
-
-
+	t : string;
+	b : string;
 begin
-	outer_add := a + b;
-end
-;	
-	
-begin
-	j.a := 4;
-	i := 0;
-	if j.a > 3 then
-		for i := 0 to 10 do
-			j.a := j.a + 4
-	else
-		while j.a > 1 do
-			j.a := j.a - 1
-	;
-	3,repeat
-		j.a := j.a - 10;
-		i := i + 1;
-	until i > 10
-	;
-	case i % 4 of
-		0, j.b := 0;
-		cn, j.b := 1;
-		2, j.b := 2;
-		3, j.b := 3;
+	i := 3;
+	j := 4;
+	i := i * j;
+	case i % 5 of
+	2, b := 'fuck2';
+	3, b := 'fuck3';
+	4, b := 'fuck4';
 	end
 	;
-	goto 3;
+	writeln(b);
 end
 .

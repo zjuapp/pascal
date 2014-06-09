@@ -98,12 +98,11 @@ public:
 class while_stmt: public base_stmt{
 public:
 	shared_ptr <base_expr> judge;
-	shared_ptr <base_stmt> stmt;
+	shared_ptr <stmt_list> stmt;
 	void debug(){
 		puts("while:");
 		int i = 2;
 		judge -> gencode();
-		stmt -> debug();
 	}
 	void gencode();
 };
@@ -196,6 +195,10 @@ public:
 	int gencode();
 };
 
-
+class sys_write_stmt:public base_stmt{
+public:
+	shared_ptr <base_expr> expr;
+	void gencode();
+};
 
 
