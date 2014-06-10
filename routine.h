@@ -22,6 +22,7 @@ public:
 		return type;
 	}
 	virtual void add_function_param();
+	int getsize();
 };
 
 class routine_record{

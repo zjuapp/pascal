@@ -468,6 +468,7 @@ factor: ID {
 		$$ = tmp;
 	}
 	| ID LP args_list RP{
+			
           	proc_stmt * tmp= new proc_stmt();
           	tmp -> proc_id = $1;
           	tmp -> param = *$3;
@@ -778,8 +779,10 @@ para_decl_list : para_decl_list  SEMI para_type_list {
 para_type_list : var_para_list COMMA  simple_type_decl{
 			$$ = new pair<int, pair <vector <string>, type_ptr> >();
 			$$ -> first = 1;
+			point_type * tmp = new point_type();
+			tmp -> nxt.reset($3);
 			$$ -> second.first = *$1;
-			$$ -> second.second.reset($3);
+			$$ -> second.second.reset(tmp);
 		}
 		| val_para_list COMMA simple_type_decl{
 			$$ = new pair<int, pair <vector <string>, type_ptr> >();

@@ -53,10 +53,6 @@ public:
 	void debug(){
 
 	}
-	virtual void emitcode(){
-		value -> emitcode();
-		cout << codestr << endl;
-	}
 };
 class record_assign: public assign_stmt{
 public:
@@ -192,7 +188,7 @@ public:
 	func_node_value(){
 		type = FUNC_EXPR_TYPE;
 	}
-	int gencode();
+	int gencode(bool _double);
 };
 
 class sys_write_stmt:public base_stmt{

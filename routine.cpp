@@ -5,24 +5,10 @@
 #include "string_data.h"
 void func::gencode(){
 	cout << name << ":" << endl;
-	for(int i = 0; i < param.size(); ++i){//reload the pass by address
-		if(param[i].first){
-			cout << "mov eax, [esp + " + itoa(param.size() * 4 + 8 - (i + 1) * 4) + "]\n";
-			cout << "add eax, " << itoa((param.size() + 3) * 4) << endl;
-			cout << "mov [esp + " + itoa(param.size() * 4 + 8 - (i + 1) * 4) + "], eax" << endl;
-		}	
-	}
 	routine::gencode();
 }
 void procedure::gencode(){
 	cout << name << ":" << endl;
-	for(int i = 0; i < param.size(); ++i){//reload the pass by address
-		if(param[i].first){
-			cout << "mov eax, [esp + " + itoa(param.size() * 4 + 8 - (i + 1) * 4) + "]\n";
-			cout << "add eax, " << itoa((param.size() + 3) * 4) << endl;
-			cout << "mov [esp + " + itoa(param.size() * 4 + 8  - (i + 1) * 4) + "], eax" << endl;
-		}	
-	}
 	routine::gencode();
 }
 void routine::gencode(){
@@ -32,13 +18,18 @@ void routine::gencode(){
 		cout << "section .text\n";
 		cout << "global main\n";
 		cout << "main:\n";
-		cout << "sub esp, " << header -> v_r -> getsize() << endl;
 		cout << "xor esi, esi" << endl;
+		cout << "extern printr" << endl;
+		cout << "extern prints" << endl;
+		cout << "extern print" << endl;
 	}
+	cout << "sub esp, " << header -> v_r -> getstacksize() << endl;//to get the stack variable
+	
 	enviroment::single() -> insert(this -> header.get());
 	for(int i = 0; i < stmt_vt -> vt.size(); ++i){
 		stmt_vt -> vt[i] -> gencode();
 	}
+	cout << "add esp, " << header -> v_r -> getstacksize() << endl;//to release the stack variable
 	if(type == FUNC_ROUTINE || type == PROC_ROUTINE){
 		cout << "ret" << endl;
 	}
@@ -60,21 +51,30 @@ void routine::add_function_param(){
 void procedure::add_function_param(){
 	int l = param.size();
 	shared_ptr <base_type> tmp(new base_type(INT_TYPE));
+	header -> v_r -> insert_front("~nop5", tmp);
 	for(int i = l - 1; i >= 0; --i){
 		header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
 	}
-	header -> v_r -> insert_front("~nop2", tmp);
 	header -> v_r -> insert_front("~nop1", tmp);
+	header -> v_r -> insert_front("~nop2", tmp);
+	header -> v_r -> insert_front("~nop3", tmp);
+	header -> v_r -> insert_front("~nop4", tmp);
 	routine::add_function_param();
 }
 void func::add_function_param(){
 	int l = param.size();
 	shared_ptr <base_type> tmp(new base_type(INT_TYPE));
+	header -> v_r -> insert_front("~nop5", tmp);
 	for(int i = l - 1; i >= 0; --i){
 		header -> v_r -> insert_front(param[i].second.first, param[i].second.second);
 	}
 	header -> v_r -> insert_front(name, ret);
+	header -> v_r -> insert_front("~nop1", tmp);
 	header -> v_r -> insert_front("~nop2", tmp);
-	header -> v_r -> insert_front("~nop1", tmp);//for esi
+	header -> v_r -> insert_front("~nop3", tmp);
+	header -> v_r -> insert_front("~nop4", tmp);
 	routine::add_function_param();
+}
+int routine::getsize(){
+	return header -> v_r -> getsize();
 }

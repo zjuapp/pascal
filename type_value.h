@@ -8,6 +8,7 @@
 #define REAL_TYPE 714285
 #define DISCRETE_TYPE 31413
 #define CONTINUE_TYPE 14133
+#define POINT_TYPE 978232
 class base_type{
 protected:
 	int type_id;
@@ -45,6 +46,17 @@ public:
 			return 4;
 		}
 	}
+};
+class point_type: public base_type{
+public:
+	int offset;
+	point_type(){
+		type_id = POINT_TYPE;
+	}
+	int getsize(){
+		return 4;
+	}
+	shared_ptr <base_type> nxt;
 };
 typedef shared_ptr <base_type> type_ptr;
 union value_set{

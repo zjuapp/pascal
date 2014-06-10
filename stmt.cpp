@@ -29,8 +29,16 @@ void record_assign::gencode(){
 			return;
 		}
 	}
-	int k  = value -> gencode();
+	bool flag = enviroment::single() -> search(id, member).second == REAL_TYPE;
+	int k = value -> gencode(flag);
 	auto in = enviroment::single() -> top() -> v_r -> search(id, member);
+	if(in.second == POINT_TYPE){
+		cout << "mov ebp, esp" << endl;
+	 	cout << "mov ebp, [ebp + " << in.first << "]" << endl;	
+		cout << "mov [ebp], " << _reg -> finde(k) << endl;
+		_reg -> setfree(k);
+		return;
+	} 
 	if(in.second == -1){	
 		auto in2 = enviroment::single() -> search(id, member);
 		if(in2.second == -1){
@@ -39,16 +47,24 @@ void record_assign::gencode(){
 		}
 		else{
 			codestr = "mov ebp, esp";
-			codestr += "\nmov [ebp + esi + " + itoa(in2.first) + "], " + _reg -> finde(k);
+			if(flag)
+				codestr += "\nfstp dword [ebp + esi + " + itoa(in2.first) + "]";
+			else{
+				codestr += "\nmov [ebp + esi + " + itoa(in2.first) + "], " + _reg -> finde(k);
+				_reg -> setfree(k);
+			}
 			cout  << codestr << endl;
-			_reg -> setfree(k);
 		}
 	}
 	else{
 		codestr = "mov ebp, esp";
-		codestr += "\nmov [ebp + " + itoa(in.first) + "], " + _reg -> finde(k);
+		if(flag)
+			codestr += "\nfstp dword [ebp + " + itoa(in.first) + "]";
+		else{
+			codestr += "\nmov [ebp + " + itoa(in.first) + "], " + _reg -> finde(k);
+			_reg -> setfree(k);
+		}
 		cout  << codestr << endl;
-		_reg -> setfree(k);
 	}
 }
 void normal_assign::gencode(){
@@ -79,8 +95,16 @@ void normal_assign::gencode(){
 			return;
 		}
 	}
-	int k  = value -> gencode();
+	bool flag = enviroment::single() -> search(id).second == REAL_TYPE;
+	int k  = value -> gencode(flag);
 	auto in = enviroment::single() -> top() -> v_r -> search(id);
+	if(in.second == POINT_TYPE){
+		cout << "mov ebp, esp" << endl;
+	 	cout << "mov ebp, [ebp + " << in.first << "]" << endl;	
+		cout << "mov [ebp], " << _reg -> finde(k) << endl;
+		_reg -> setfree(k);
+		return;
+	} 
 	if(in.second == -1){	
 		auto in2 = enviroment::single() -> search(id);
 		if(in2.second == -1){
@@ -89,16 +113,25 @@ void normal_assign::gencode(){
 		}
 		else{
 			codestr = "mov ebp, esp";
-			codestr += "\nmov [ebp + esi + " + itoa(in2.first) + "], " + _reg -> finde(k);
-			cout  << codestr << endl;
+			if(flag)
+				codestr += "\nfstp dword [ebp + esi + " + itoa(in2.first) + "]";
+			else{
+				codestr += "\nmov [ebp + esi + " + itoa(in2.first) + "], " + _reg -> finde(k);
 			_reg -> setfree(k);
-		}
+			}
+			cout  << codestr << endl;
+		}	
+		
 	}
 	else{
 		codestr = "mov ebp, esp";
-		codestr += "\nmov [ebp + " + itoa(in.first) + "], " + _reg -> finde(k);
-		cout  << codestr << endl;
-		_reg -> setfree(k);
+		if(flag)
+			codestr += "\nfstp dword [ebp + " + itoa(in.first) + "]";
+		else{
+			codestr += "\nmov [ebp + " + itoa(in.first) + "], " + _reg -> finde(k);
+			_reg -> setfree(k);
+		}	
+		cout << codestr << endl;
 	}
 }
 void proc_stmt::debug(){
@@ -109,8 +142,6 @@ void proc_stmt::gencode(){
 	auto res = enviroment::single() -> searchfunc(proc_id);
 	auto rout = res.first;
 	auto off = res.second;
-	cout << "push esi" << endl;
-	cout << "add esi, " << off << endl;
 	if(rout == nullptr){
 		cout << "no function:" << proc_id << "is founded" << endl;
 		return;
@@ -125,49 +156,62 @@ void proc_stmt::gencode(){
 		}
 		for(int i = 0; i < param.size(); ++i){
 			if(fun -> param[i].first == 1){
+				bool flag = false;
+				bool point_flag = false;
 				pair <int, int> offset;
 				if(param[i] -> gettype() == ARR_EXPR_TYPE){
 					auto res = (arr_node_value *)param[i].get();
 				 	offset = enviroment::single() -> search(res -> id, 0);
-					if(offset.second != fun -> param[i].second.second -> gettype()){
-						cout << "param " << i << " type unconsistent"<< endl;
-						return;
-					}
+				 	if(enviroment::single() -> top() -> v_r -> search(res -> id, 0).second != -1)
+				 		flag = true;	
 				}
 				else
 				if(param[i] -> gettype() == ID_EXPR_TYPE){
 					auto res = (id_node_value *)param[i].get();
 					offset = enviroment::single() -> search(res -> id);
-					if(offset.second != fun -> param[i].second.second -> gettype()){
-						cout << "param " << i << " type unconsistent" << endl;
-						return;
-					}
+					if(offset.second == POINT_TYPE){
+						point_flag = true;
+					}	
+					if(enviroment::single() -> top() -> v_r -> search(res -> id).second != -1)
+				 		flag = true;
+					
 				}
 				else
 				if(param[i] -> gettype() == RECORD_EXPR_TYPE){
 					auto res = (record_node_value *)param[i].get();
 					offset = enviroment::single() -> search(res -> id, res -> member);
-					if(offset.second != fun -> param[i].second.second -> gettype()){
-						cout << "param " << i << " type unconsistent";
-						return;
-					}
+					if(enviroment::single() -> top() -> v_r -> search(res -> id, res -> member).second != -1)
+				 		flag = true;
 				}
-				codestr += "\nmov eax ," + itoa(offset.first);
-				codestr += "\nmov [ebp - " + itoa((i + 2) * 4) + "], eax";
+				if(point_flag){
+					codestr += "\nmov eax, [ebp + " + itoa(offset.first) + "]";
+					codestr += "\nmov [ebp - " + itoa((i + 5) * 4) + "], eax";
+				}
+				else{
+					codestr += "\nmov eax, ebp";
+					codestr += "\nadd eax ," + itoa(offset.first);
+					if(!flag){
+						codestr += "\nadd eax, esi";
+						codestr += "\nadd eax, " + itoa(off);
+					}
+					codestr += "\nmov [ebp - " + itoa((i + 5) * 4) + "], eax";
+				}
 			
 			}
 			else{
 				cout << codestr << endl;
 				int ret = param[i] -> gencode();
 				codestr = "";
-				codestr += "\nmov [ebp - " + itoa((i + 2) * 4)  + "], " + reg::single() -> finde(ret);
+				codestr += "\nmov [ebp - " + itoa((i + 5) * 4)  + "], " + reg::single() -> finde(ret);
 				reg::single() -> setfree(ret);
 			}	
 		}
-		codestr += "\nsub esp, " + itoa(call_length);
-		codestr += "\ncall " + fun -> name;
-		codestr += "\nadd esp, " + itoa(call_length);
-		cout << codestr << endl;	
+		cout << codestr << endl;
+		reg::single() -> push();
+		cout << "add esi, " << off << endl;
+		cout << "sub esp, " + itoa(call_length) << endl;
+		cout << "call " + fun -> name << endl;
+		cout << "add esp, " + itoa(call_length) << endl;
 	}
 	else{
 		int call_length = (param.size() + 1) * 4;
@@ -181,52 +225,66 @@ void proc_stmt::gencode(){
 		}
 		for(int i = 0; i < param.size(); ++i){
 			pair<int, int> offset;
+			bool flag = false;
+			bool point_flag = false;
 			if(fun -> param[i].first == 1){
 				if(param[i] -> gettype() == ARR_EXPR_TYPE){
 					auto res = (arr_node_value *)param[i].get();
 					offset = enviroment::single() -> search(res -> id, 0);
-					if(offset.second != fun -> param[i].second.second -> gettype()){
-						cout << "param " << i << " type unconsistent"<< endl;
-						return;
-					}
+					if(enviroment::single() -> top() -> v_r -> search(res -> id, 0).second != -1)
+				 		flag = true;
+					
 				}
 				else
 				if(param[i] -> gettype() == ID_EXPR_TYPE){
 					auto res = (id_node_value *)param[i].get();
 					offset = enviroment::single() -> search(res -> id);
-					if(offset.second != fun -> param[i].second.second -> gettype()){
-						cout << "param " << i << " type unconsistent" << endl;
-						return;
-					}
+					if(enviroment::single() -> top() -> v_r -> search(res -> id).second != -1)
+				 		flag = true;
+					if(offset.second == POINT_TYPE){
+						point_flag = true;
+					}	
 				}
 				else
 				if(param[i] -> gettype() == RECORD_EXPR_TYPE){
 					auto res = (record_node_value *)param[i].get();
 					offset = enviroment::single() -> search(res -> id, res -> member);
-					if(offset.second != fun -> param[i].second.second -> gettype()){
-						cout << "param " << i << " type unconsistent";
-						return;
-					}
+					if(enviroment::single() -> top() -> v_r -> search(res -> id, res -> member).second != -1)
+				 		flag = true;
+					
 				}
-				codestr += "\nmov eax ," + itoa(offset.first);
-				codestr += "\nmov [ebp - " + itoa((i + 2) * 4) + "], eax";
+				if(point_flag){
+					codestr += "\nmov eax, [ebp + " + itoa(offset.first) + "]";
+					codestr += "\nmov [ebp - " + itoa((i + 6) * 4) + "], eax";
+				}
+				else{
+					codestr += "\nmov eax, ebp";
+					codestr += "\nadd eax ," + itoa(offset.first);
+					if(!flag){
+						codestr += "\nadd eax, esi";
+						codestr += "\nadd eax, " + itoa(off);
+					}
+					codestr += "\nmov [ebp - " + itoa((i + 6) * 4) + "], eax";
+				}
 			}
 			else{
 				cout << codestr << endl;
 				int ret = param[i] -> gencode();
 				codestr = "";
-				codestr += "\nmov [ebp - " + itoa((i + 2) * 4) + "], " + reg::single() -> finde(ret);
+				codestr += "\nmov [ebp - " + itoa((i + 6) * 4) + "], " + reg::single() -> finde(ret);
 				reg::single() -> setfree(ret);
 			}	
 		}
-		codestr += "\nsub esp, " + itoa(call_length);
-		codestr += "\ncall " + fun -> name;
-		codestr += "\nadd esp, " + itoa(call_length - 4);
-		codestr += "\nmov ebp, esp\nmov eax, [ebp]";
-		codestr += "\nadd esp, 4";
 		cout << codestr << endl;
+		reg::single() -> push();
+		cout << "add esi, " << off << endl;
+		cout << "sub esp, " + itoa(call_length) << endl;
+		cout << "call " + fun -> name << endl;
+		cout << "add esp, " + itoa(call_length - 4) << endl;
+		cout << "mov ebp, esp\nmov eax, [ebp]" << endl;
+		cout << "add esp, 4" << endl;
 	}
-	cout << "pop esi" << endl;
+	reg::single() -> pop();
 }
 void arr_assign::gencode(){
 	base_stmt::gencode();
@@ -355,16 +413,18 @@ void sys_write_stmt::gencode(){
 	cout << "push dword " + reg::single() -> finde(k) << endl;
 	reg::single() -> setfree(k);
 	if(expr -> isstr()){
-		cout << "extern prints" << endl;
 		cout << "call prints" << endl;
 	}
-	else{
-		cout << "extern print" << endl;
+	else
+		if(expr -> isdouble()){
+		cout << "call printr" << endl;
+		}
+		else{
 		cout << "call print" << endl;
 	}
 	cout << "pop " + reg::single() -> finde(k) << endl;
 }
-int func_node_value::gencode(){
+int func_node_value::gencode(bool _double){
 	func_stmt -> gencode();
 	int k = reg::single() -> findfree();
 	reg::single() -> setflag(k);

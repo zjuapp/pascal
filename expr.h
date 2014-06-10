@@ -26,21 +26,15 @@ public:
 		flag = false;
 		type = BASE_EXPR_TYPE;
 	}
-	virtual int gencode(){
+	virtual int gencode(bool _double = false){
 	}//return the value is store in?
 	void setcodestr(const string & _codestr){
 		codestr = _codestr;
-	}
-	virtual bool expr_value_type(){
-
 	}
 	virtual ~base_expr(){
 		
 	}
 	virtual bool isconst(){
-
-	}
-	virtual void emitcode(){
 
 	}
 	virtual bool isstr(){
@@ -49,23 +43,24 @@ public:
 	virtual bool isconststr(string & s){
 		return false;
 	}
+	virtual bool isdouble(){
+		return false;
+	}
 };
 
 class unary_expr: public base_expr{
 public:
 	int op;
 	shared_ptr <base_expr> child;
-	int gencode();
-	bool expr_value_type();
+	int gencode(bool _double);
 	unary_expr(){
 		type = UNARY_EXPR_TYPE;
 	}
 	bool isconst(){
 		return child -> isconst();
 	}
-	void emitcode(){
-		child -> emitcode();
-		cout << codestr << endl;
+	bool isdouble(){
+		return child -> isdouble();
 	}
 };
 
@@ -75,39 +70,27 @@ public:
 	int op;
 	shared_ptr <base_expr>  lchild;
 	shared_ptr <base_expr> rchild;
-	int gencode();
-	bool expr_value_type();
+	int gencode(bool _double);
 	binary_expr(){
 		type = BINARY_EXPR_TYPE;
 	}
 	bool isconst(){
 		return lchild -> isconst() && rchild -> isconst();
 	}
-	void emitcode(){
-		lchild -> emitcode();
-		rchild -> emitcode();
-		cout << codestr << endl;
+	bool isdouble(){
+		return lchild -> isdouble() && rchild -> isdouble();
 	}
 };
 class leaf_node_value: public base_expr{
 public:
 	value_set value;
 	int type_id;
-	int gencode();
+	int gencode(bool _double);
 	leaf_node_value(){
 		type = CONST_EXPR_TYPE;
 	}
-	bool expr_value_type(){
-		if(type_id == INT_TYPE)
-			return false;
-		else
-			return true;
-	}
 	bool isconst(){
 		return true;
-	}
-	void emitcode(){
-		cout << codestr << endl;
 	}
 	bool isstr(){
 		if(type_id == STR_TYPE){
@@ -124,13 +107,15 @@ public:
 		else
 			return false;
 	}
+	bool isdouble(){
+		return type_id == REAL_TYPE;
+	}
 }; 
 class record_node_value: public base_expr{
 public:
 	string id;
 	string member;
-	int gencode();
-	bool expr_value_type();
+	int gencode(bool _double);
 	record_node_value(){
 		type = RECORD_EXPR_TYPE;
 	}
@@ -138,9 +123,7 @@ public:
 		return false;
 	}
 	bool isstr();
-	void emitcode(){
-		cout << codestr << endl;
-	}
+	bool isdouble();
 };
 
 class id_node_value: public base_expr{
@@ -149,15 +132,12 @@ public:
 	id_node_value(){
 		type = ID_EXPR_TYPE;
 	}
-	int gencode();
-	bool expr_value_type();
+	int gencode(bool _double);
 	bool isconst(){
 		return false;
 	}
 	bool isstr();
-	void emitcode(){
-		cout << codestr << endl;
-	}
+	bool isdouble();
 };
 
 class arr_node_value: public base_expr{
@@ -167,15 +147,13 @@ public:
 	arr_node_value(){
 		type = ARR_EXPR_TYPE;
 	}
-	int gencode();
+	int gencode(bool _double);
 	bool expr_value_type();
 	bool isconst(){
 		return false;
 	}
 	bool isstr();
-	void emitcode(){
-		cout << codestr << endl;
-	}
+	bool isdouble();
 };
 
 

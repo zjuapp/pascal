@@ -25,4 +25,15 @@ public:
 		}
 		return _s;
 	}
+	int getstacksize(){
+		int _s = 0;
+		int l = vt.size();
+		int off = 0;
+		for(int i = l - 1; i >= 0; --i){
+			if(vt[i].first[0] == '~')
+				break;
+			off += vt[i].second -> getsize();
+		}
+		return off;
+	}
 };

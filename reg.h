@@ -14,6 +14,18 @@ private:
 	}
 public:
 	vector <string> vt;
+	void push(){
+		cout << "push esi" << endl;
+		cout << "push edi" << endl;
+		cout << "push ebx" << endl;
+		cout << "push ecx" << endl;
+	}
+	void pop(){
+		cout << "pop ecx" << endl;
+		cout << "pop ebx" << endl;
+		cout << "pop edi" << endl;
+		cout << "pop esi" << endl;
+	}
 	bool flag[REG_SIZE];
 	static shared_ptr <reg> single(){
 		static bool flag = false;
