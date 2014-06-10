@@ -24,7 +24,8 @@ using namespace std;
 #define UNEQUAL_TYPE 3293
 #define NOT_TYPE 3295
 #define AND_TYPE 3296
-
+extern int lineno;
+extern bool flag;
 inline double atof(const char * str){
 	int l = strlen(str);
 	double total = 0;

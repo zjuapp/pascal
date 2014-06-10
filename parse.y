@@ -103,9 +103,12 @@
 %%
 program : PROGRAM ID SEMI routine DOT{
 	$4 -> name = $2;
+	if(flag){
+		return 1;
+	}
 	enviroment::single() -> clear();
-	$4 -> add_function_param();
 	$4 -> gencode();
+	return 0;
 }
 routine: routine_head routine_body{
 	$$ = new routine();
@@ -117,7 +120,6 @@ routine_head: const_part{
 	$$ -> c_r.reset($1);
 	enviroment::single() -> insert($$);
 	} type_part {
-		shared_ptr <type_record> tmp($3);
 		enviroment::single() -> top() -> t_r.reset($3);
 	}var_part {
 	enviroment::single() -> top() -> v_r.reset($5);
@@ -204,7 +206,7 @@ type_decl_list : type_decl_list ID EQUAL type_decl SEMI{
 		shared_ptr <base_type> tmp($4);
 		$1 -> insert($2, tmp);	
 		$$ = $1;
-	}	 
+	}	
 	| ID EQUAL type_decl SEMI{
 		$$ = new type_record();
 		shared_ptr <base_type> tmp($3);
@@ -255,7 +257,7 @@ field_decl: name_list  COMMA type_decl SEMI{
 
 simple_type_decl : SYS_TYPE
 	{
-		if(strcmp($1, "int") == 0){
+		if(strcmp($1, "integer") == 0){
 			$$ = new base_type(INT_TYPE);
 		}
 		else
@@ -342,6 +344,33 @@ var_decl_list : var_decl_list name_list COMMA type_decl SEMI{
 			} 
 		}	
 	$$ = $1;
+	}
+	| var_decl_list name_list COMMA ID SEMI{
+		auto res= enviroment::single() -> searchtype($4);	if(res == nullptr){
+		cerr << lineno << ": type not found: " << $4 << endl;
+		}	
+		else{	
+		for(auto i = $2 -> begin(); i != $2 -> end(); ++i){
+			if(!$1 -> insert(*i, res)){
+				yyerror("var_decl error");
+			}
+		}	
+		}
+	$$ = $1;
+	}
+	| name_list COMMA ID SEMI{
+		$$ = new var_record();
+		auto res = enviroment::single() -> searchtype($3);
+		if(res == nullptr){
+		cerr << lineno << ": type not found: " << $3 << endl;
+		}	
+		else{
+		for(auto i = $1 -> begin(); i != $1 -> end(); ++i){
+			if(!$$ -> insert(*i, res)){
+				yyerror("var_decl error");
+			} 
+			}	
+		}
 	}
 	| name_list COMMA type_decl SEMI{
 		$$ = new var_record();
@@ -463,12 +492,22 @@ term: term MUL factor{
 	;
 
 factor: ID {
-		id_node_value * tmp = new id_node_value();
-		tmp -> id = $1;
-		$$ = tmp;
+		auto res1 = enviroment::single() -> searchconst($1);
+		if(res1.first == nullptr){
+			auto res2 = enviroment::single() -> search($1);
+			id_node_value * tmp = new id_node_value();
+			tmp -> id = $1;
+			$$ = tmp;
+		}
+		//const replace
+		else{
+			leaf_node_value * tmp = new leaf_node_value();
+			tmp -> type_id = res1.first -> gettype();
+			tmp -> value = res1.second;
+			$$ = tmp;
+		}
 	}
-	| ID LP args_list RP{
-			
+	| ID LP args_list RP{		
           	proc_stmt * tmp= new proc_stmt();
           	tmp -> proc_id = $1;
           	tmp -> param = *$3;
@@ -483,13 +522,13 @@ factor: ID {
 	| NOT factor{
 		unary_expr * tmp = new unary_expr();
 		tmp -> child.reset($2);
-		tmp -> op = NOT;
+		tmp -> op = NOT_TYPE;
 		$$ = tmp;
 	}
 	| MINUS factor{
 		unary_expr * tmp = new unary_expr();
 		tmp -> child.reset($2);
-		tmp -> op = MINUS;
+		tmp -> op = MINUS_TYPE;
 		$$ = tmp;
 	}
 	| ID LB expression RB{
@@ -525,10 +564,9 @@ factor: ID {
 		tmp -> value._str = strdup(str.c_str());
 		$$ = tmp;
 	}
-
 	;
 
-arg_list: arg_list COMMA expression
+arg_list: arg_list COLON expression
 	| expression
 	;
 
@@ -638,7 +676,8 @@ while_stmt : WHILE expression DOO BEGINN stmt_list END{
 		$$ = tmp;
 	};
 
-for_stmt : FOR ID ASSIGN expression direction expression DOO stmt {
+for_stmt : FOR ID ASSIGN expression direction expression DOO routine_body {
+		
 		for_stmt * tmp = new for_stmt();
 		tmp -> id = $2;
 		tmp -> end.reset($6);
@@ -659,6 +698,10 @@ direction : TO{
 
 case_stmt : CASEE expression OF case_expr_list 
 		END{
+			if(!$2 -> isleaf() && !$2 -> checktype($2 -> isdouble())){
+				cout << lineno << ": type not match" << endl;
+				flag = true;
+			}
 			case_stmt * tmp = new case_stmt();
 			tmp -> expr.reset($2);
 			tmp -> case_list.reset($4);
@@ -678,13 +721,13 @@ case_expr_list : case_expr_list  case_expr{
 		;
 
 case_expr : const_value
- COLON stmt SEMI{	
+ COMMA stmt SEMI{	
 		case_expr * tmp = new case_expr();
 		tmp -> value.reset($1);
 		tmp -> stmt.reset($3);
 		$$ = tmp;
 	}
-		| ID COLON stmt SEMI{
+		| ID COMMA stmt SEMI{
 			auto res = enviroment::single() -> searchconst($1);
 			case_expr * tmp = new case_expr();
 			key_value_tuple * tp = new key_value_tuple();
@@ -720,7 +763,7 @@ sys_stmt : WRITELN LP expression RP{
 		tmp -> expr.reset($3);
 		$$ = tmp;
 	}
-args_list : args_list  COMMA  expression{
+args_list : args_list  COLON  expression{
 	shared_ptr <base_expr> tmp($3);
 	$1 -> push_back(tmp);
 	$$ = $1;
@@ -755,6 +798,7 @@ procedure_decl : PROCEDURE ID  parameters SEMI sub_routine SEMI{
 				$$ -> param.push_back(make_pair(i -> first, make_pair(*j, i -> second.second)));
 			}
 		}
+		$$ -> add_function_param();
 	}
 		;
 
@@ -804,7 +848,7 @@ val_para_list : name_list{
 		;
 
 
-function_decl :  FUNCTION  ID  parameters  COLON  				simple_type_decl   SEMI  sub_routine  SEMI{
+function_decl :  FUNCTION  ID  parameters  COMMA  				simple_type_decl   SEMI  sub_routine  SEMI{
 		$$ = new func();
 		$$ -> name = $2;
 		$$ -> header = $7 -> header;
@@ -815,6 +859,7 @@ function_decl :  FUNCTION  ID  parameters  COLON  				simple_type_decl   SEMI  s
 			}
 		}
 		$$ -> ret.reset($5);
+		$$ -> add_function_param();
 	}
 	;
 %%

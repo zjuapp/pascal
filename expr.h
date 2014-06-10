@@ -46,6 +46,12 @@ public:
 	virtual bool isdouble(){
 		return false;
 	}
+	virtual bool checktype(bool _double	){
+
+	}
+	virtual bool isleaf(){
+		return true;
+	}	
 };
 
 class unary_expr: public base_expr{
@@ -61,6 +67,12 @@ public:
 	}
 	bool isdouble(){
 		return child -> isdouble();
+	}
+	bool checktype(bool _double){
+		return child -> checktype(_double);
+	}
+	bool isleaf(){
+		return false;
 	}
 };
 
@@ -79,6 +91,12 @@ public:
 	}
 	bool isdouble(){
 		return lchild -> isdouble() && rchild -> isdouble();
+	}
+	bool checktype(bool _double){
+		return lchild -> checktype(_double) && rchild -> checktype(_double);
+	}
+	bool isleaf(){
+		return false;
 	}
 };
 class leaf_node_value: public base_expr{
@@ -110,6 +128,12 @@ public:
 	bool isdouble(){
 		return type_id == REAL_TYPE;
 	}
+	bool checktype(bool _double){
+		if(_double)
+			return type_id == REAL_TYPE || type_id == INT_TYPE;
+		else
+			return type_id == INT_TYPE;
+	}
 }; 
 class record_node_value: public base_expr{
 public:
@@ -124,6 +148,7 @@ public:
 	}
 	bool isstr();
 	bool isdouble();
+	bool checktype(bool _double);
 };
 
 class id_node_value: public base_expr{
@@ -138,6 +163,7 @@ public:
 	}
 	bool isstr();
 	bool isdouble();
+	bool checktype(bool _double);
 };
 
 class arr_node_value: public base_expr{
@@ -154,6 +180,7 @@ public:
 	}
 	bool isstr();
 	bool isdouble();
+	bool checktype(bool _double);
 };
 
 

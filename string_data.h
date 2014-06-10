@@ -19,7 +19,7 @@ public:
 	}
 	void gencode(){
 		for(int i = 0; i < vt.size(); ++i){
-			cout << vt[i].first << " db \"" << vt[i].second << "\", 0x0a, 0" << endl; 
+			cout << vt[i].first << " db \"" << vt[i].second << "\", 0" << endl; 
 		}
 	}
 	static shared_ptr <string_data> single(){

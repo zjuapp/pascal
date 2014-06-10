@@ -331,7 +331,7 @@ void arr_assign::gencode(){
 			return;
 		}
 	}
-	bool flag = enviroment::single() -> search(id).second == REAL_TYPE;
+	bool flag = enviroment::single() -> search(id, 3).second == REAL_TYPE;
 	int k  = value -> gencode(flag);
 	auto in = enviroment::single() -> top() -> v_r -> search(id,3);
 	if(in.second == -1){	
@@ -409,11 +409,13 @@ void for_stmt::gencode(){
 	string break_place = labelmanager::genlabel();
 	_reg -> setfree(k);
 	cout << loop + ":" << endl;
+	for(int i = 0; i < stmt -> vt.size(); ++i){
+		stmt -> vt[i] -> gencode();
+	}
 	int w = end -> gencode();
 	cout << "mov eax, [ebp + " << off.first  << "]" << endl;
 	cout << "cmp eax, " + _reg -> finde(w) << endl;
 	cout << "jz " + break_place << endl;
-	stmt -> gencode();
 	if(dic){
 		cout << "mov eax, [ebp + " << off.first << "]" << endl; 
 		cout << "sub eax, 1" << endl;
@@ -508,7 +510,14 @@ void sys_write_stmt::gencode(){
 int func_node_value::gencode(bool _double){
 	func_stmt -> gencode();
 	int k = reg::single() -> findfree();
-	reg::single() -> setflag(k);
-	cout << "mov " +reg::single() -> finde(k) + ", eax" << endl;
+	if(_double){
+		cout << "push eax" << endl;
+		cout << "fld dword [esp]" << endl; 
+		cout << "pop eax " << endl;
+	}
+	else{
+		reg::single() -> setflag(k);
+		cout << "mov " +reg::single() -> finde(k) + ", eax" << endl;
+	}
 	return k;
 }

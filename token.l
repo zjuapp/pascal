@@ -8,6 +8,8 @@
     #include "expr.h"
     #include "routine.h"
     #include "y.tab.h"
+    extern int lineno = 0;
+    extern bool flag = false;
 %}
 
 const "const"
@@ -41,7 +43,7 @@ string "'".*"'"
 semi ";" 
 program "program"
 type "type"
-sys_type int|string|real|char
+sys_type integer|string|real|char
 record "record"
 end "end"
 array "array"
@@ -114,7 +116,7 @@ procedure "procedure"
 	yylval._str = new char[l - 2];
 	strncpy(yylval._str, yytext + 1, l - 2);return STRING;}
 {semi} {return SEMI;}
-\n {}
+\n {lineno++;}
 \t {}
 " " {}
 . {return yytext[0];}

@@ -159,10 +159,7 @@ int record_node_value::gencode(bool _double){
 			}
 			else{
 			k = _reg -> findfree();
-			switch(off2.second){
-				cout << "mov " + _reg -> finde(k) + ", [ebp + esi + " + itoa(off2.first) + "]" << endl;
-				break;
-			}
+			cout << "mov " + _reg -> finde(k) + ", [ebp + esi + " + itoa(off2.first) + "]" << endl;
 			_reg -> setflag(k);
 			}
 		}
@@ -174,10 +171,7 @@ int record_node_value::gencode(bool _double){
 		}
 		else{
 			k = _reg -> findfree();
-			switch(off.second){
-				cout << "mov " + _reg -> finde(k) + ", [ebp + " + itoa(off.first) + "]" << endl;
-				break;
-			}
+			cout << "mov " + _reg -> finde(k) + ", [ebp + " + itoa(off.first) + "]" << endl;
 			_reg -> setflag(k);
 		}
 	}
@@ -277,7 +271,7 @@ int arr_node_value::gencode(bool _double){
 		cout << "imul eax, " << base_type::size(off.second) << endl;
 		cout << "add esi, eax" << endl;
 		if(_double){
-			cout << "fld dword [ebp + esi" + itoa(off.first) + "]" << endl;
+			cout << "fld dword [ebp + esi + " + itoa(off.first) + "]" << endl;
 		}
 		else{
 			cout << "mov " + _reg -> finde(ind) + ", [ebp + esi + " + itoa(off.first) + "]" << endl;
@@ -287,7 +281,7 @@ int arr_node_value::gencode(bool _double){
 	return ind;
 }
 bool arr_node_value::isdouble(){
-	auto off = enviroment::single() -> search(id);
+	auto off = enviroment::single() -> search(id, 3);
 	return off.second == REAL_TYPE;
 }
 bool id_node_value::isdouble(){
@@ -298,5 +292,29 @@ bool id_node_value::isdouble(){
 bool record_node_value::isdouble(){
 	auto off = enviroment::single() -> search(id, member);
 	return off.second == REAL_TYPE;
+}
+bool record_node_value::checktype(bool _double){
+	auto off = enviroment::single() -> search(id, member);
+	if(_double){
+		return off.second == REAL_TYPE;
+	}
+	else
+		return off.second == INT_TYPE;
+}
+bool id_node_value::checktype(bool _double){
+	auto off = enviroment::single() -> search(id);
+	if(_double){
+		return off.second == REAL_TYPE;
+	}
+	else
+		return off.second == INT_TYPE;
+}
+bool arr_node_value::checktype(bool _double){
+	auto off = enviroment::single() -> search(id, 3);
+	if(_double){
+		return off.second == REAL_TYPE;
+	}
+	else
+		return off.second == INT_TYPE;
 }
 

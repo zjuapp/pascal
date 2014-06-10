@@ -100,18 +100,8 @@ public:
 	string id;
 	shared_ptr <base_expr> start;
 	shared_ptr <base_expr> end;
-	shared_ptr <base_stmt> stmt;
+	shared_ptr <stmt_list> stmt;
 	int dic;
-	void debug(){
-		puts("forr");
-		int i = 2;
-		puts("start");
-		start -> gencode();
-		puts("end");
-		end -> gencode();
-		puts("stmt");
-		stmt -> debug();
-	}	
 	void gencode();
 };
 class repeat_stmt: public base_stmt{
