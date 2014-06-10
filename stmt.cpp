@@ -4,6 +4,7 @@
 void record_assign::gencode(){
 	base_stmt::gencode();
 	auto _reg = reg::single();
+	_reg -> clear();
 	string str;
 	if(value -> isconststr(str)){
 		auto in = enviroment::single() -> top() -> v_r -> search(id, member);
@@ -70,6 +71,7 @@ void record_assign::gencode(){
 void normal_assign::gencode(){
 	base_stmt::gencode();
 	auto _reg = reg::single();
+	_reg -> clear();
 	string str;
 	if(value -> isconststr(str)){
 		auto in = enviroment::single() -> top() -> v_r -> search(id);
@@ -288,35 +290,110 @@ void proc_stmt::gencode(){
 }
 void arr_assign::gencode(){
 	base_stmt::gencode();
-	codestr = "";
-	auto offset = enviroment::single() -> search(id, 3);
-	int k = index -> gencode();
-	if(k != 0){
-		reg::single() -> setfree(k);
-		codestr += "\nmov esi, " + reg::single() -> finde(k);
+	auto _reg = reg::single();
+	_reg -> clear();
+	int ind  = index -> gencode();
+	_reg -> setflag(ind);
+	string str;
+	if(value -> isconststr(str)){
+		auto in = enviroment::single() -> top() -> v_r -> search(id,3);
+		if(in.second == -1){	
+			auto in2 = enviroment::single() -> search(id,3);
+			if(in2.second == -1){
+				cout << id << " not found" << endl;
+				return;
+			}
+			else{
+				codestr = "";
+				cout << "mov ebp, esp" << endl;
+				cout << "push esi" << endl;
+				cout << "mov edx, " << _reg -> finde(ind) << endl;
+				cout << "imul edx, " << base_type::size(in2.second) << endl;
+				cout << "add esi, edx" << endl;
+				codestr += "\nmov eax, " + str;
+				codestr += "\nmov [ebp + esi + " + itoa(in2.first) + "], eax";
+				cout  << codestr << endl;
+				cout << "pop esi";
+				return;
+			}
+		}
+		else{
+			codestr = "";
+			cout << "mov ebp, esp" << endl;
+			cout << "push esi" << endl;
+			cout << "xor esi ,esi" << endl;
+			cout << "mov edx, " << _reg -> finde(ind) << endl;
+			cout << "imul edx, " << base_type::size(in.second) << endl;
+			cout << "add esi, edx" << endl;	
+			codestr += "\nmov eax, " + str;
+			codestr += "\nmov [ebp + esi" + itoa(in.first) + "], eax";
+			cout  << codestr << endl;
+			return;
+		}
 	}
-	codestr += "\nimul esi, " + itoa(base_type::size(offset.second));
-	int v = value -> gencode();
-	codestr += "\nmov ebp, esp\n";
-	codestr += "\nmov [ebp + esi + " + itoa(offset.first) + "], " + reg::single() -> finde(v);
-	cout << codestr << endl;
-	reg::single() -> setfree(k);
+	bool flag = enviroment::single() -> search(id).second == REAL_TYPE;
+	int k  = value -> gencode(flag);
+	auto in = enviroment::single() -> top() -> v_r -> search(id,3);
+	if(in.second == -1){	
+		auto in2 = enviroment::single() -> search(id,3);
+		if(in2.second == -1){
+			cout << id << " not found" << endl;
+			return;
+		}
+		else{
+			codestr = "";
+			cout << "mov ebp, esp" << endl;
+			cout << "push esi" << endl;
+			cout << "mov edx, " << _reg -> finde(ind) << endl;
+			cout << "imul edx, " << base_type::size(in2.second) << endl;
+			cout << "add esi, edx" << endl;
+			if(flag)
+				codestr += "\nfstp dword [ebp + esi + " + itoa(in2.first) + "]";
+			else{
+				codestr += "\nmov [ebp + esi + " + itoa(in2.first) + "], " + _reg -> finde(k);
+			_reg -> setfree(k);
+			}
+			cout  << codestr << endl;
+			cout << "pop esi" << endl;
+		}	
+		
+	}
+	else{
+		codestr = "";
+		cout << "mov ebp, esp" << endl;
+		cout << "push esi" << endl;
+		cout << "xor esi, esi" << endl;
+		cout << "mov edx, " << _reg -> finde(ind) << endl;
+		cout << "imul edx, " << base_type::size(in.second) << endl;
+		cout << "add esi, edx" << endl;
+		if(flag)
+			codestr += "\nfstp dword [ebp + esi + " + itoa(in.first) + "]";
+		else{
+			codestr += "\nmov [ebp + esi + " + itoa(in.first) + "], " + _reg -> finde(k);
+			_reg -> setfree(k);
+		}	
+		cout << codestr << endl;
+		cout << "pop esi" << endl;
+	}
 }
 void if_stmt::gencode(){
 	base_stmt::gencode();
+	reg::single() -> clear();
 	int k = judge -> gencode();
 	string a1 = labelmanager::genlabel();
 	string a2 = labelmanager::genlabel();
 	cout << "cmp " + reg::single() -> finde(k) + ", 0" << endl;
 	reg::single() -> setfree(k);	
 	cout << "jz " + a1 << endl;
-	lchild -> gencode();
+	for(int i = 0; i < lchild -> vt.size(); ++i)
+	lchild -> vt[i] -> gencode();
 	cout << "jmp " + a2 << endl;
 	cout << a1 + ":" << endl;
 	if(rchild == nullptr){
 	}
 	else{
-		rchild -> gencode();
+		for(int i = 0; i < rchild -> vt.size(); ++i)
+		rchild -> vt[i] -> gencode();
 	}
 	cout << a2 << ":" << endl;
 }
@@ -324,6 +401,7 @@ void for_stmt::gencode(){
 	base_stmt::gencode();
 	auto off = enviroment::single() -> search(id);
 	auto _reg = reg::single();
+	_reg -> clear();
 	int k = start -> gencode();
 	cout << "mov ebp, esp" << endl;
 	cout << "mov [ebp + " << off.first << "], " + _reg -> finde(k) << endl;
@@ -352,6 +430,7 @@ void for_stmt::gencode(){
 void while_stmt::gencode(){
 	base_stmt::gencode();
 	auto _reg = reg::single();
+	_reg -> clear();
 	string loop =  labelmanager::genlabel();
 	string break_place = labelmanager::genlabel();
 	cout << loop + ":" << endl; 
@@ -369,6 +448,7 @@ void while_stmt::gencode(){
 void case_stmt::gencode(){
 	base_stmt::gencode();
 	auto _reg = reg::single();
+	_reg -> clear();
 	vector <string> label_vt;
 	int lcmp = expr -> gencode();
 	for(int i = 0; i < case_list -> case_vt.size(); ++i){
@@ -393,6 +473,7 @@ void case_stmt::gencode(){
 void repeat_stmt::gencode(){
 	base_stmt::gencode();
 	auto _reg = reg::single();
+	_reg -> clear();
 	string loop =  labelmanager::genlabel();
 	cout << loop + ":";
 	for(int i = 0; i < stmt_vt -> vt.size(); ++i){

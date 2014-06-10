@@ -1,0 +1,20 @@
+program hello;
+var
+	c : array [0..10] of int;
+	d : array [0..10] of int;
+	i : int;
+begin
+	for i := 0 to 10 do
+		c[i] := i
+	;
+	for i := 0 to 10 do
+		d[i] := 10 - i
+	;
+	for i := 0 to 10 do
+		c[i] := c[i] * d[i]
+	;
+	for i := 0 to 10 do
+		writeln(c[i])
+	;
+end
+.

@@ -1,5 +1,5 @@
 #include "common.h"
-#define REG_SIZE 4
+#define REG_SIZE 3
 class reg{
 private:
 	void init(){
@@ -57,6 +57,7 @@ public:
 				return i;
 			}
 		}
+		cout << "no reg free" << endl;
 		return -1;
 	}
 	void clear(){

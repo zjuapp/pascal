@@ -34,17 +34,9 @@ public:
 class if_stmt:public base_stmt{
 public:
 	shared_ptr <base_expr>  judge;
-	shared_ptr <base_stmt> lchild;
-	shared_ptr <base_stmt> rchild;
+	shared_ptr <stmt_list> lchild;
+	shared_ptr <stmt_list> rchild;
 	void gencode();
-	void debug(){
-		puts("if_stmt");
-		int i = 2;
-		judge -> gencode();
-		lchild -> debug();
-		if(rchild.get() != nullptr)
-		rchild -> debug();
-	}
 };
 
 class assign_stmt:public base_stmt{

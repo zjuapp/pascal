@@ -147,19 +147,6 @@ int record_node_value::gencode(bool _double){
 	auto _reg = reg::single();
 	auto off = enviroment::single() -> top() -> v_r -> search(id, member);
 	int k;
-	if(off.second == POINT_TYPE){
-		cout << "mov ebp, esp" << endl;
-	 	cout << "mov eax, [ebp + " << off.first << "]" << endl;	
-		cout << "add eax, " << enviroment::single() -> top() -> v_r -> getsize() << endl;
-		cout << "push esi" << endl;
-		cout << "mov esi, eax" << endl;
-		k = _reg -> findfree();
-		cout << "mov " + _reg -> finde(k) + ", [ebp + esi]" << endl;
-		_reg -> setflag(k);
-		cout << "pop esi" << endl;
-		return k;
-	}
-
 	if(off.second == -1){
 		auto off2 = enviroment::single() -> search(id, member);
 		if(off2.second == -1){
@@ -222,7 +209,8 @@ int id_node_value::gencode(bool _double){
 	 	cout << "mov ebp, [ebp + " << off.first << "]" << endl;	
 		k = _reg -> findfree();
 		cout << "mov " + _reg -> finde(k) + ", [ebp]" << endl;
-		_reg -> setflag(k);
+		cout << "mov ebp, esp" << endl;
+	 	_reg -> setflag(k);
 		return k;
 	} 
 	if(off.second == -1){
@@ -257,8 +245,46 @@ int id_node_value::gencode(bool _double){
 }
 
 int arr_node_value::gencode(bool _double){
-	auto off = enviroment::single() -> search(id);
-	return off.second == REAL_TYPE;
+	auto _reg = reg::single();
+	auto off = enviroment::single() -> top() -> v_r -> search(id,3);
+	int ind = index -> gencode();
+	_reg -> setflag(ind);
+	if(off.second == -1){
+		auto off2 = enviroment::single() -> search(id, 3);
+		if(off2.second == -1){
+			cout << "id:" + id + " not found" << endl;
+		}
+		else{	
+			cout << "mov ebp, esp" << endl;
+			cout << "push esi" << endl;
+			cout << "mov eax, " << _reg -> finde(ind) << endl;
+			cout << "imul eax, " << base_type::size(off2.second) << endl;
+			cout << "add esi, eax" << endl;
+			if(_double){
+				cout << "fld dword [ebp + esi" + itoa(off2.first) + "]" << endl;
+			}
+			else{
+				cout << "mov " + _reg -> finde(ind) + ", [ebp + esi + " + itoa(off2.first) + "]" << endl;
+			}
+			cout << "pop esi" << endl;
+		}
+	}
+	else{
+		cout << "mov ebp, esp" << endl;
+		cout << "push esi" << endl;
+		cout << "xor esi, esi" << endl;
+		cout << "mov eax, " << _reg -> finde(ind) << endl;
+		cout << "imul eax, " << base_type::size(off.second) << endl;
+		cout << "add esi, eax" << endl;
+		if(_double){
+			cout << "fld dword [ebp + esi" + itoa(off.first) + "]" << endl;
+		}
+		else{
+			cout << "mov " + _reg -> finde(ind) + ", [ebp + esi + " + itoa(off.first) + "]" << endl;
+		}
+		cout << "pop esi" << endl;
+	}
+	return ind;
 }
 bool arr_node_value::isdouble(){
 	auto off = enviroment::single() -> search(id);

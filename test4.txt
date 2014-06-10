@@ -6,19 +6,19 @@ const
 var	
 	f : int;
 	k : int;
-function gao(var b : int; a : int), int;
+function go(var b : int; a : int), int;
 var 
 	fk : int;
 	t : real;
 
 begin
 	if a > 0 then 
-		gao := a * gao(b : a - 1)
+		go := a * go(b : a - 1)
 	else
-		gao := 1
+		go := 1
 	;
-	b := b + gao;
-	k := k + gao;
+	b := b + go;
+	k := k + go;
 end
 ;
 

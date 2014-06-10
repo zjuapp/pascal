@@ -68,7 +68,7 @@
 %type <_stmt> assign_stmt
 %type <_stmt> non_label_stmt
 %type <_stmt> stmt
-%type <_stmt> else_clause
+%type <_stmt_list> else_clause
 %type <_stmt> if_stmt
 %type <_stmt> for_stmt
 %type <_stmt> while_stmt
@@ -496,6 +496,7 @@ factor: ID {
 		arr_node_value * tmp = new arr_node_value();
 		tmp -> id = $1;
 		tmp -> index.reset($3);
+		$$ = tmp;
 	}	
 	| ID DOT ID{
 		record_node_value * tmp = new record_node_value();
@@ -606,7 +607,7 @@ assign_stmt: ID ASSIGN expression{
 		$$ = tmp;
 	}
 	;
-if_stmt : IFF expression THEN stmt else_clause{
+if_stmt : IFF expression THEN  routine_body else_clause{
 		if_stmt * tmp = new if_stmt();
 		tmp -> judge.reset($2);
 		tmp -> lchild.reset($4);
@@ -614,7 +615,7 @@ if_stmt : IFF expression THEN stmt else_clause{
 		$$ = tmp;
 	}
 		;
-else_clause : ELSEE stmt{
+else_clause : ELSEE routine_body{
 		$$ = $2;
 	}
 		|{
